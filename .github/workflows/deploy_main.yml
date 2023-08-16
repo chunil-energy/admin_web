@@ -50,5 +50,5 @@ jobs:
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
         with:
           status: ${{ job.status }}
-          title: '천일 인계서 관리자 프론트 배포완료'
-          message: '천일 인계서 관리자 프론트 배포완료'
+          title: '천일 관리자 프론트 배포완료'
+          message: '천일 관리자 프론트 배포완료'
