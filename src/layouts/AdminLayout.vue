@@ -43,15 +43,15 @@
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
                           <router-link v-if="!item.children" :to="{name: item.router_name}" @click="sidebarOpen = false"
-                                       :class="[item.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
+                                       :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                             <component :is="item.icon"
-                                       :class="[item.router_name === this.$route.name ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600', 'h-6 w-6 shrink-0']"
+                                       :class="[item.router_name === route.name ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600', 'h-6 w-6 shrink-0']"
                                        aria-hidden="true"/>
                             {{ item.name }}
                           </router-link>
                           <Disclosure as="div" v-else v-slot="{ open }">
                             <DisclosureButton
-                                :class="[item.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
+                                :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
                               <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
                               {{ item.name }}
                               <ChevronRightIcon
@@ -64,7 +64,7 @@
                                 <!--                        <DisclosureButton as="a" :href="subItem.href"-->
                                 <DisclosureButton :as="RouterLink" :to="{name: subItem.router_name}"
                                                   @click="sidebarOpen = false"
-                                                  :class="[subItem.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
+                                                  :class="[subItem.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
                                   {{ subItem.name }}
                                 </DisclosureButton>
                               </li>
@@ -120,13 +120,13 @@
 
                 <li v-for="item in navigation" :key="item.name">
                   <router-link v-if="!item.children" :to="{name: item.router_name}"
-                               :class="[item.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
+                               :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
                     <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
                     {{ item.name }}
                   </router-link>
                   <Disclosure as="div" v-else v-slot="{ open }">
                     <DisclosureButton
-                        :class="[item.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
+                        :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
                       <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
                       {{ item.name }}
                       <ChevronRightIcon
@@ -138,7 +138,7 @@
                         <!-- 44px -->
                         <!--                        <DisclosureButton as="a" :href="subItem.href"-->
                         <DisclosureButton :as="RouterLink" :to="{name: subItem.router_name}"
-                                          :class="[subItem.router_name === this.$route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
+                                          :class="[subItem.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
                           {{ subItem.name }}
                         </DisclosureButton>
                       </li>
@@ -198,7 +198,7 @@
         <span class="sr-only">Open sidebar</span>
         <Bars3Icon class="h-6 w-6" aria-hidden="true"/>
       </button>
-      <div class="flex-1 text-sm font-semibold leading-6 text-gray-900">{{ this.$route.meta.name || '천일 관리자' }}</div>
+      <div class="flex-1 text-sm font-semibold leading-6 text-gray-900">{{ route.meta.name || '천일 관리자' }}</div>
       <router-link :to="{name: 'profile'}"
                    class="flex items-center gap-x-3 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50">
 
@@ -329,6 +329,7 @@ const teams = [
 
 
 const authStore = useAuthStore()
+
 const logout = () => {
   authStore.logout()
 }
