@@ -1,5 +1,4 @@
 <script setup>
-import {defineComponent} from 'vue'
 
 import {CheckCircleIcon, XCircleIcon, MinusCircleIcon} from '@heroicons/vue/24/outline'
 import {XMarkIcon} from '@heroicons/vue/20/solid'
