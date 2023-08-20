@@ -9,6 +9,7 @@ import {useAuthStore} from "@/stores/auth";
 import AffiliateListView from "@/views/affiliate/AffiliateListView.vue";
 import AffiliateCreateView from "@/views/affiliate/AffiliateCreateView.vue";
 import AffiliateDetailView from "@/views/affiliate/AffiliateDetailView.vue";
+import VehicleCreateView from "@/views/vehicle/VehicleCreateView.vue";
 
 
 const router = createRouter({
@@ -62,6 +63,12 @@ const router = createRouter({
           name: 'vehicle_list',
           component: VehicleListView,
           meta: {name: '차량목록', requireAuth: true}
+        },
+        {
+          path: '/vehicle/create',
+          name: 'vehicle_create',
+          component: VehicleCreateView,
+          meta: {name: '차량등록', requireAuth: true}
         },
         {
           path: '/vehicle/:vehicleId',

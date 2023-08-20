@@ -107,7 +107,8 @@
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+<!--    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarOpen ? 'lg:w-72':'lg:w-16']" @mouseenter="() => desktopSidebarOpen=true" @mouseleave="() => desktopSidebarOpen=false">-->
+    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarOpen ? 'lg:w-72':'lg:w-16']">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <div class="flex h-16 shrink-0 items-center">
@@ -120,62 +121,91 @@
 
                 <li v-for="item in navigation" :key="item.name">
                   <router-link v-if="!item.children" :to="{name: item.router_name}"
-                               :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
+                               :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', desktopSidebarOpen ? '' : 'justify-center', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
                     <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
+                    <template v-if="desktopSidebarOpen">
                     {{ item.name }}
+                    </template>
                   </router-link>
                   <Disclosure as="div" v-else v-slot="{ open }">
                     <DisclosureButton
-                        :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
+                        :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700', desktopSidebarOpen ? '' : 'justify-center']">
                       <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
+                      <template v-if="desktopSidebarOpen">
                       {{ item.name }}
                       <ChevronRightIcon
                           :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'ml-auto h-5 w-5 shrink-0']"
                           aria-hidden="true"/>
+                      </template>
                     </DisclosureButton>
-                    <DisclosurePanel as="ul" class="mt-1 px-2">
-                      <li v-for="subItem in item.children" :key="subItem.name">
-                        <!-- 44px -->
-                        <!--                        <DisclosureButton as="a" :href="subItem.href"-->
-                        <DisclosureButton :as="RouterLink" :to="{name: subItem.router_name}"
-                                          :class="[subItem.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
-                          {{ subItem.name }}
-                        </DisclosureButton>
-                      </li>
-                    </DisclosurePanel>
+                    <template v-if="desktopSidebarOpen">
+                      <DisclosurePanel as="ul" class="mt-1 px-2">
+                        <li v-for="subItem in item.children" :key="subItem.name">
+                          <!-- 44px -->
+                          <!--                        <DisclosureButton as="a" :href="subItem.href"-->
+                          <DisclosureButton :as="RouterLink" :to="{name: subItem.router_name}"
+                                            :class="[subItem.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">
+                            {{ subItem.name }}
+                          </DisclosureButton>
+                        </li>
+                      </DisclosurePanel>
+                    </template>
                   </Disclosure>
                 </li>
                 <li>
-                  <a href="#" @click="logout"
-                     :class="'text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'">
+                  <button type="button" @click="logout" :class="[desktopSidebarOpen ? '' : 'justify-center']"
+                     class="text-gray-700 hover:text-indigo-600 w-full hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                     <component :is="ArrowRightOnRectangleIcon"
                                :class="'text-gray-400 group-hover:text-indigo-600 h-6 w-6 shrink-0'"
                                aria-hidden="true"/>
+                    <template v-if="desktopSidebarOpen">
                     로그아웃
-                  </a>
+                    </template>
+                  </button>
                 </li>
 
               </ul>
             </li>
+          </ul>
             <!-- teams -->
-            <li>
-              <div class="text-xs font-semibold leading-6 text-gray-400">외부 서비스</div>
-              <ul role="list" class="-mx-2 mt-2 space-y-1">
-                <li v-for="team in teams" :key="team.name">
-                  <a :href="team.href"
-                     class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                    <span
-                        class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">{{
-                        team.initial
-                      }}</span>
-                    <span class="truncate">{{ team.name }}</span>
-                  </a>
-                </li>
-              </ul>
+<!--            <li v-if="desktopSidebarOpen">-->
+<!--              <div class="text-xs font-semibold leading-6 text-gray-400">외부 서비스</div>-->
+<!--              <ul role="list" class="-mx-2 mt-2 space-y-1">-->
+<!--                <li v-for="team in teams" :key="team.name">-->
+<!--                  <a :href="team.href"-->
+<!--                     class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">-->
+<!--                    <span-->
+<!--                        class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">{{-->
+<!--                        team.initial-->
+<!--                      }}</span>-->
+<!--                    <span class="truncate">{{ team.name }}</span>-->
+<!--                  </a>-->
+<!--                </li>-->
+<!--              </ul>-->
+<!--            </li>-->
+
+          <ul role="list" class="gap-y-7">
+            <li class="-mx-6 mt-auto">
+              <button type="button" @click="toggleDesktopSidebarOpen"
+                  class="flex items-center gap-x-4 px-6 py-3 w-full text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarOpen ? '' : 'justify-center']">
+                <template v-if="desktopSidebarOpen">
+                <ChevronLeftIcon
+                    class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
+                </template>
+                <template v-else>
+                  <ChevronRightIcon
+                      class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
+                </template>
+
+                <template v-if="desktopSidebarOpen">
+                  <span class="sr-only">메뉴 숨기기</span>
+                  <span aria-hidden="true">메뉴 숨기기</span>
+                </template>
+              </button>
             </li>
             <li class="-mx-6 mt-auto">
               <router-link :to="{name: 'profile'}"
-                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50">
+                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarOpen ? '' : 'justify-center']">
                 <!--                <img class="h-8 w-8 rounded-full bg-gray-50"-->
                 <!--                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"-->
                 <!--                     alt=""/>-->
@@ -184,24 +214,25 @@
                     class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">
                   {{ authStore.profile.name ? authStore.profile.name[0] : authStore.profile.username[0] }}
                 </span>
-                <span class="sr-only">{{ authStore.profile.name || authStore.profile.username }}</span>
-                <span aria-hidden="true">{{ authStore.profile.name || authStore.profile.username }}</span>
+                <template v-if="desktopSidebarOpen">
+                  <span class="sr-only">{{ authStore.profile.name || authStore.profile.username }}</span>
+                  <span aria-hidden="true">{{ authStore.profile.name || authStore.profile.username }}</span>
+                </template>
               </router-link>
             </li>
           </ul>
         </nav>
       </div>
     </div>
-
+    <!-- Static sidebar for Mobile -->
     <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
       <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
-        <span class="sr-only">Open sidebar</span>
+        <span class="sr-only">Open Sidebar</span>
         <Bars3Icon class="h-6 w-6" aria-hidden="true"/>
       </button>
       <div class="flex-1 text-sm font-semibold leading-6 text-gray-900">{{ route.meta.name || '천일 관리자' }}</div>
       <router-link :to="{name: 'profile'}"
                    class="flex items-center gap-x-3 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50">
-
                 <span
                     class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">
                   {{ authStore.profile.name[0] }}
@@ -214,44 +245,7 @@
       </router-link>
     </div>
 
-
-<!--    <nav class="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">-->
-<!--      <ol role="list" class="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">-->
-<!--        <li class="flex">-->
-<!--          <div class="flex items-center">-->
-<!--            <router-link :to="{name: 'home'}" class="text-gray-400 hover:text-gray-500">-->
-<!--              <HomeIcon class="h-5 w-5 flex-shrink-0" aria-hidden="true"/>-->
-<!--              <span class="sr-only">Home</span>-->
-<!--            </router-link>-->
-<!--          </div>-->
-<!--        </li>-->
-<!--        <li v-for="matched in route.matched" :key="matched.name" class="flex">-->
-<!--          <div class="flex items-center">-->
-<!--            <svg class="h-full w-6 flex-shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none"-->
-<!--                 fill="currentColor" aria-hidden="true">-->
-<!--              <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>-->
-<!--            </svg>-->
-<!--            <template v-if="matched.name">-->
-<!--            <router-link :to="{name: matched.name}" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"-->
-<!--               :aria-current="matched.name === route.name ? 'page' : undefined">{{ matched.meta.name }}</router-link>-->
-<!--            </template>-->
-<!--            <template v-else>-->
-<!--              <span class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"-->
-<!--                 :aria-current="matched.name === route.name ? 'page' : undefined">{{ matched.meta.name }}</span>-->
-<!--            </template>-->
-<!--          </div>-->
-<!--        </li>-->
-<!--        &lt;!&ndash;        <li v-for="page in pages" :key="page.name" class="flex">&ndash;&gt;-->
-<!--        &lt;!&ndash;          <div class="flex items-center">&ndash;&gt;-->
-<!--        &lt;!&ndash;            <svg class="h-full w-6 flex-shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor" aria-hidden="true">&ndash;&gt;-->
-<!--        &lt;!&ndash;              <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />&ndash;&gt;-->
-<!--        &lt;!&ndash;            </svg>&ndash;&gt;-->
-<!--        &lt;!&ndash;            <a :href="page.href" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" :aria-current="page.current ? 'page' : undefined">{{ page.name }}</a>&ndash;&gt;-->
-<!--        &lt;!&ndash;          </div>&ndash;&gt;-->
-<!--        &lt;!&ndash;        </li>&ndash;&gt;-->
-<!--      </ol>-->
-<!--    </nav>-->
-    <main class="py-10 lg:pl-72">
+    <main class="py-10" :class="['py-10', desktopSidebarOpen ? 'lg:pl-72' : 'lg:pl-16']">
       <div class="px-4 sm:px-6 lg:px-8">
         <!-- Your content -->
         <router-view/>
@@ -265,7 +259,7 @@
 import {onMounted, ref} from 'vue'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
-import {ChevronRightIcon} from '@heroicons/vue/20/solid'
+import {ChevronRightIcon, ChevronLeftIcon} from '@heroicons/vue/20/solid'
 
 import {
   Bars3Icon,
@@ -334,4 +328,13 @@ const logout = () => {
   authStore.logout()
 }
 const sidebarOpen = ref(false)
+
+const desktopSidebarOpenStorage = localStorage.getItem('desktopSidebarOpen')
+const desktopSidebarOpen = ref(desktopSidebarOpenStorage ? JSON.parse(desktopSidebarOpenStorage):true)
+
+const toggleDesktopSidebarOpen = () => {
+  const currentState = desktopSidebarOpen.value
+  desktopSidebarOpen.value = !currentState
+  localStorage.setItem('desktopSidebarOpen', JSON.parse(!currentState))
+}
 </script>

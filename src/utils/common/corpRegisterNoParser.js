@@ -1,4 +1,4 @@
-import onlyDigitParser from "@/utils/onlyDigitParser";
+import onlyDigitParser from "@/utils/common/onlyDigitParser";
 
 const corpRegisterNoParser = (value) => {
     const targetValue = onlyDigitParser(value)

@@ -21,6 +21,7 @@
     "axios": "^1.4.0",
     "dayjs": "^1.11.9",
     "jwt-decode": "^3.1.2",
+    "normalize-text": "^2.4.1",
     "pinia": "^2.1.4",
     "tailwindcss": "^3.3.3",
     "uuid": "^9.0.0",

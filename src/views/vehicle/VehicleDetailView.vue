@@ -5,9 +5,9 @@ import {onMounted, ref} from "vue";
 
 import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
 import {useRoute} from "vue-router";
-import vehicleTypeParser from "@/utils/vehicleTypeParser";
-import vehiclePositionParser from "@/utils/vehiclePositionParser";
-import vehicleVehicleDriverParser from "@/utils/vehicleVehicleDriverParser";
+import vehicleTypeParser from "@/utils/vehicle/vehicleTypeParser";
+import vehiclePositionParser from "@/utils/vehicle/vehiclePositionParser";
+import vehicleVehicleDriverParser from "@/utils/vehicle/vehicleVehicleDriverParser";
 
 export default {
   setup() {

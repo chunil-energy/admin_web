@@ -1,4 +1,4 @@
-import onlyDigitParser from "@/utils/onlyDigitParser";
+import onlyDigitParser from "@/utils/common/onlyDigitParser";
 
 const brnParser = (value) => {
     const targetValue = onlyDigitParser(value)

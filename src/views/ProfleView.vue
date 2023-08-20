@@ -1,7 +1,7 @@
 <script>
-import vehicleVehicleDriverParser from "@/utils/vehicleVehicleDriverParser";
-import vehiclePositionParser from "@/utils/vehiclePositionParser";
-import vehicleTypeParser from "@/utils/vehicleTypeParser";
+import vehicleVehicleDriverParser from "@/utils/vehicle/vehicleVehicleDriverParser";
+import vehiclePositionParser from "@/utils/vehicle/vehiclePositionParser";
+import vehicleTypeParser from "@/utils/vehicle/vehicleTypeParser";
 import axios from "axios";
 import {useAuthStore} from "@/stores/auth";
 

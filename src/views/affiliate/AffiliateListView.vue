@@ -4,9 +4,9 @@ import {useAuthStore} from "@/stores/auth";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/20/solid'
 import {useRoute} from "vue-router";
 import getAffiliateList from "@/apis/affiliate/list";
-import onlyDigitParser from "@/utils/onlyDigitParser"
-import brnParser from "@/utils/brnParser";
-import corpRegisterNoParser from "../../utils/corpRegisterNoParser";
+import onlyDigitParser from "@/utils/common/onlyDigitParser"
+import brnParser from "@/utils/common/brnParser";
+import corpRegisterNoParser from "../../utils/common/corpRegisterNoParser";
 export default {
   name: 'AffiliateListView',
   setup() {
@@ -124,7 +124,7 @@ export default {
             {{ corpRegisterNoParser(affiliate.registration_no) }}
           </td>
           <td :class="[affiliateIdx === 0 ? '' : 'border-t border-gray-200', 'relative py-4 pl-4 pr-3 text-sm sm:pl-6']">
-            {{ affiliate.parent?.name }}
+            {{ affiliate?.parent_name }}
           </td>
           <!--          <td :class="[vehicleIdx === 0 ? '' : 'border-t border-gray-200', 'px-3 py-3.5 text-sm text-gray-500']">-->
           <!--            <div class="sm:hidden">{{ vehicle.price }}/mo</div>-->
