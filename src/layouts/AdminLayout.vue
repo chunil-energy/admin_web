@@ -122,8 +122,7 @@
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-<!--    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarOpen ? 'lg:w-72':'lg:w-16']" @mouseenter="() => desktopSidebarOpen=true" @mouseleave="() => desktopSidebarOpen=false">-->
-    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarOpen ? 'lg:w-72':'lg:w-16']">
+    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarShow ? 'lg:w-72':'lg:w-16']" @mouseenter="() => desktopSidebarHover = true" @mouseleave="() => desktopSidebarHover = false">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <div class="flex h-16 shrink-0 items-center">
@@ -136,24 +135,24 @@
 
                 <li v-for="item in navigation" :key="item.name">
                   <router-link v-if="!item.children" :to="{name: item.router_name}"
-                               :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', desktopSidebarOpen ? '' : 'justify-center', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
+                               :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', desktopSidebarShow ? '' : 'justify-center', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
                     <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
-                    <template v-if="desktopSidebarOpen">
+                    <template v-if="desktopSidebarShow">
                     {{ item.name }}
                     </template>
                   </router-link>
                   <Disclosure as="div" v-else v-slot="{ open }">
                     <DisclosureButton
-                        :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700', desktopSidebarOpen ? '' : 'justify-center']">
+                        :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700', desktopSidebarShow ? '' : 'justify-center']">
                       <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
-                      <template v-if="desktopSidebarOpen">
+                      <template v-if="desktopSidebarShow">
                       {{ item.name }}
                       <ChevronRightIcon
                           :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'ml-auto h-5 w-5 shrink-0']"
                           aria-hidden="true"/>
                       </template>
                     </DisclosureButton>
-                    <template v-if="desktopSidebarOpen">
+                    <template v-if="desktopSidebarShow">
                       <DisclosurePanel as="ul" class="mt-1 px-2">
                         <li v-for="subItem in item.children" :key="subItem.name">
                           <!-- 44px -->
@@ -168,12 +167,12 @@
                   </Disclosure>
                 </li>
                 <li>
-                  <button type="button" @click="logout" :class="[desktopSidebarOpen ? '' : 'justify-center']"
+                  <button type="button" @click="logout" :class="[desktopSidebarShow ? '' : 'justify-center']"
                      class="text-gray-700 hover:text-indigo-600 w-full hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                     <component :is="ArrowRightOnRectangleIcon"
                                :class="'text-gray-400 group-hover:text-indigo-600 h-6 w-6 shrink-0'"
                                aria-hidden="true"/>
-                    <template v-if="desktopSidebarOpen">
+                    <template v-if="desktopSidebarShow">
                     로그아웃
                     </template>
                   </button>
@@ -183,7 +182,7 @@
             </li>
           </ul>
             <!-- teams -->
-<!--            <li v-if="desktopSidebarOpen">-->
+<!--            <li v-if="desktopSidebarShow">-->
 <!--              <div class="text-xs font-semibold leading-6 text-gray-400">외부 서비스</div>-->
 <!--              <ul role="list" class="-mx-2 mt-2 space-y-1">-->
 <!--                <li v-for="team in teams" :key="team.name">-->
@@ -201,26 +200,32 @@
 
           <ul role="list" class="gap-y-7">
             <li class="-mx-6 mt-auto">
-              <button type="button" @click="toggleDesktopSidebarOpen"
-                  class="flex items-center gap-x-4 px-6 py-3 w-full text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarOpen ? '' : 'justify-center']">
-                <template v-if="desktopSidebarOpen">
-                <ChevronLeftIcon
+              <button type="button" @click="toggleDesktopSidebarLock"
+                  class="flex items-center gap-x-4 px-6 py-3 w-full text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarShow ? '' : 'justify-center']">
+                <template v-if="desktopSidebarLock">
+                <LockClosedIcon
                     class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
                 </template>
                 <template v-else>
-                  <ChevronRightIcon
+                  <LockOpenIcon
                       class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
                 </template>
 
-                <template v-if="desktopSidebarOpen">
-                  <span class="sr-only">메뉴 숨기기</span>
-                  <span aria-hidden="true">메뉴 숨기기</span>
+                <template v-if="desktopSidebarShow">
+                  <template v-if="desktopSidebarLock">
+                    <span class="sr-only">메뉴 고정 해제</span>
+                    <span aria-hidden="true">메뉴 고정 해제</span>
+                  </template>
+                  <template v-else>
+                    <span class="sr-only">메뉴 고정</span>
+                    <span aria-hidden="true">메뉴 고정</span>
+                  </template>
                 </template>
               </button>
             </li>
             <li class="-mx-6 mt-auto">
               <router-link :to="{name: 'profile'}"
-                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarOpen ? '' : 'justify-center']">
+                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarShow ? '' : 'justify-center']">
                 <!--                <img class="h-8 w-8 rounded-full bg-gray-50"-->
                 <!--                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"-->
                 <!--                     alt=""/>-->
@@ -229,7 +234,7 @@
                     class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">
                   {{ authStore.profile.name ? authStore.profile.name[0] : authStore.profile.username[0] }}
                 </span>
-                <template v-if="desktopSidebarOpen">
+                <template v-if="desktopSidebarShow">
                   <span class="sr-only">{{ authStore.profile.name || authStore.profile.username }}</span>
                   <span aria-hidden="true">{{ authStore.profile.name || authStore.profile.username }}</span>
                 </template>
@@ -260,7 +265,7 @@
       </router-link>
     </div>
 
-    <main class="py-10" :class="['py-10', desktopSidebarOpen ? 'lg:pl-72' : 'lg:pl-16']">
+    <main class="py-10" :class="['py-10', desktopSidebarShow ? 'lg:pl-72' : 'lg:pl-16']">
       <div class="px-4 sm:px-6 lg:px-8">
         <!-- Your content -->
         <router-view/>
@@ -271,10 +276,10 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
-import {ChevronRightIcon, ChevronLeftIcon} from '@heroicons/vue/20/solid'
+import {ChevronRightIcon, LockOpenIcon, LockClosedIcon} from '@heroicons/vue/20/solid'
 
 import {
   Bars3Icon,
@@ -346,12 +351,22 @@ const logout = () => {
 }
 const sidebarOpen = ref(false)
 
-const desktopSidebarOpenStorage = localStorage.getItem('desktopSidebarOpen')
-const desktopSidebarOpen = ref(desktopSidebarOpenStorage ? JSON.parse(desktopSidebarOpenStorage):true)
-
-const toggleDesktopSidebarOpen = () => {
-  const currentState = desktopSidebarOpen.value
-  desktopSidebarOpen.value = !currentState
-  localStorage.setItem('desktopSidebarOpen', JSON.parse(!currentState))
+const desktopSidebarLockStorage = localStorage.getItem('desktopSidebarLock')
+const desktopSidebarLock = ref(desktopSidebarLockStorage ? JSON.parse(desktopSidebarLockStorage):true)
+const desktopSidebarHover = ref(false)
+const desktopSidebarShow = computed(() => {
+  let show = true
+  if (desktopSidebarLock.value === true) {
+    show = true
+  } else {
+    show = desktopSidebarHover.value
+  }
+  console.log('show ', show)
+  return show
+})
+const toggleDesktopSidebarLock = () => {
+  const currentState = desktopSidebarLock.value
+  desktopSidebarLock.value = !currentState
+  localStorage.setItem('desktopSidebarLock', JSON.parse(desktopSidebarLock.value))
 }
 </script>
