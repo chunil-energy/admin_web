@@ -13,7 +13,6 @@ import createAffiliate from "@/apis/affiliate/create";
 
 const authStore = useAuthStore()
 const errorStore = useErrorStore()
-const route = useRoute()
 const router = useRouter()
 
 const { values: formValues, errors: formErrors, handleSubmit, defineInputBinds, setFieldValue  } = useForm({validationSchema: affiliateCreateSchema});

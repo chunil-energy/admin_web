@@ -69,7 +69,6 @@ export const useAuthStore = defineStore({
                 // console.log('UNEXPIRED')
                 return this.accessToken !== null && this.refreshToken !== null
             }
-
         },
         async tokenRefresh() {
             const errorState = useErrorStore()

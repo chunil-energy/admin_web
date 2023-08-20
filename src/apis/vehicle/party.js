@@ -1,10 +1,13 @@
 import axios from "axios";
 import {useAuthStore} from "@/stores/auth";
 import {useErrorStore} from "@/stores/error";
+import {useLayoutStore} from "@/stores/layout";
 
 
 const getSetParty = async (params) => {
     const errorStore = useErrorStore()
+    const layoutStore = useLayoutStore()
+    layoutStore.overlayOn()
     try {
         const authStore = useAuthStore()
         await authStore.tokenRefresh()
@@ -24,6 +27,8 @@ const getSetParty = async (params) => {
     } catch (e) {
         errorStore.set('error', '조회 실패', `사업장 목록 조회중 오류가 발생했습니다. ${e}`)
         return null
+    } finally {
+        layoutStore.overlayOff()
     }
 }
 

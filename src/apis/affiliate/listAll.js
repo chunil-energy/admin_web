@@ -1,12 +1,15 @@
 import axios from "axios";
 import {useAuthStore} from "@/stores/auth";
 import {useErrorStore} from "@/stores/error";
+import {useLayoutStore} from "@/stores/layout";
 
 
 const getAllAffiliateList = async (params) => {
     const errorStore = useErrorStore()
+    const layoutStore = useLayoutStore()
+    const authStore = useAuthStore()
+    layoutStore.overlayOn()
     try {
-        const authStore = useAuthStore()
         await authStore.tokenRefresh()
         const affiliateUrl = `${import.meta.env.VITE_API_URL}/api/admin/v1/affiliate/all/`;
         const option = {
@@ -24,6 +27,8 @@ const getAllAffiliateList = async (params) => {
     } catch (e) {
         errorStore.set('error', '조회 실패', `사업장 목록 조회중 오류가 발생했습니다. ${e}`)
         return []
+    } finally {
+        layoutStore.overlayOff()
     }
 }
 
