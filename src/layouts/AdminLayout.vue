@@ -361,7 +361,6 @@ const desktopSidebarShow = computed(() => {
   } else {
     show = desktopSidebarHover.value
   }
-  console.log('show ', show)
   return show
 })
 const toggleDesktopSidebarLock = () => {

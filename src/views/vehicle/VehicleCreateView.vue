@@ -9,6 +9,11 @@ import loginView from "@/views/auth/LoginView.vue";
 import createVehicle from "@/apis/vehicle/create";
 import {useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/error";
+import isNumberKey from "@/utils/common/isNumberKey";
+import isKorNumberKey from "@/utils/common/isKorNumberKey";
+import onlyDigitParser from "@/utils/common/onlyDigitParser";
+import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
+import isAlphaNumericKey from "@/utils/common/isAlphaNumericKey";
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -51,7 +56,11 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
           <div class="border-t border-gray-100 px-4 py-6 sm:col-span-2 sm:px-6">
             <dt class="text-sm font-medium leading-6 text-gray-900">차량번호</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
-              <input type="text" id="car_no" name="car_no" :class="[...defaultTextInput]" v-bind="car_no" @keydown.space.prevent="(event) => {return null}">
+              <input type="text" id="car_no" name="car_no" :class="[...defaultTextInput]"
+                     v-bind="car_no"
+                     @keypress="isKorNumberKey($event)"
+                     @paste.prevent="vehicleCreateSetFieldValue('car_no', onlyKorNumberParser($event.clipboardData.getData('text')))"
+              >
               <p class="mt-2 text-sm text-gray-900">* 공백 없이 입력해주세요</p>
               <p class="mt-2 text-sm text-red-600" id="car_no-error" v-if="vehicleCreateErrors.car_no">
                 {{ vehicleCreateErrors.car_no }}
@@ -61,7 +70,10 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
           <div class="border-t border-gray-100 px-4 py-6 sm:col-span-3 sm:px-6">
             <dt class="text-sm font-medium leading-6 text-gray-900">차대번호</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
-              <input type="text" id="vin" name="vin" :class="[...defaultTextInput]" maxlength="17" v-bind="vin" @keydown.space.prevent="(event) => {return null}">
+              <input type="text" id="vin" name="vin"
+                     :class="[...defaultTextInput]" maxlength="17"
+                     @keypress="isAlphaNumericKey($event)"
+                     v-bind="vin">
               <p class="mt-2 text-sm text-red-600" id="vin-error" v-if="vehicleCreateErrors.vin">
                 {{ vehicleCreateErrors.vin }}
               </p>
