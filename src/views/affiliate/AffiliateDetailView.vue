@@ -45,7 +45,7 @@ const onSubmit = handleSubmit(async values => {
   if (response.success) {
     errorStore.set('success', '성공', '수정사항이 저장되었습니다.')
   } else {
-
+    errorStore.set('error', '실패', response.message)
   }
 });
 
@@ -61,6 +61,7 @@ const onSubmit = handleSubmit(async values => {
     </div>
 
     <div class="-mx-4 mt-10  sm:mx-0 sm:rounded-lg" v-if="affiliateData">
+      {{formErrors}}
       <form @submit.prevent="onSubmit" method="post">
         <div class="space-y-12">
           <div class="border-b border-gray-900/10 pb-12">
