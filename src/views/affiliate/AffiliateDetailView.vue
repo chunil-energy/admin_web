@@ -9,6 +9,7 @@ import {onMounted, ref} from "vue";
 import updateAffiliate from "@/apis/affiliate/update";
 import AffiliateSelectComponent from "@/components/affiliate/AffiliateSelectComponent.vue";
 import FileUploadComponent from "@/components/common/FileUploadComponent.vue";
+import onlyDigitParser from "@/utils/common/onlyDigitParser";
 
 const authStore = useAuthStore()
 const errorStore = useErrorStore()
@@ -108,6 +109,8 @@ const onSubmit = handleSubmit(async values => {
                 <label for="brn" class="block text-sm font-medium leading-6 text-gray-900">사업자등록번호</label>
                 <div class="mt-2">
                   <input type="text" name="brn" id="brn" v-bind="brn" maxlength="10"
+                         @input="setFieldValue('brn', onlyDigitParser($event.target.value))"
+                         :value="brn.value"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">10자리 숫자만 입력하세요</p>
@@ -119,8 +122,9 @@ const onSubmit = handleSubmit(async values => {
                 <label for="registration_no"
                        class="block text-sm font-medium leading-6 text-gray-900">법인등록번호</label>
                 <div class="mt-2">
-                  <input type="text" name="registration_no" id="registration_no" v-bind="registration_no"
-                         maxlength="13"
+                  <input type="text" name="registration_no" id="registration_no" v-bind="registration_no" maxlength="13"
+                         @input="setFieldValue('registration_no', onlyDigitParser($event.target.value))"
+                         :value="registration_no.value"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">13자리 숫자만 입력하세요</p>

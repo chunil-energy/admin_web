@@ -14,6 +14,7 @@ import isKorNumberKey from "@/utils/common/isKorNumberKey";
 import onlyDigitParser from "@/utils/common/onlyDigitParser";
 import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
 import isAlphaNumericKey from "@/utils/common/isAlphaNumericKey";
+import onlyAlphaNumericParser from "@/utils/common/onlyAlphaNumericParser";
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -57,9 +58,8 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
             <dt class="text-sm font-medium leading-6 text-gray-900">차량번호</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
               <input type="text" id="car_no" name="car_no" :class="[...defaultTextInput]"
-                     v-bind="car_no"
-                     @keypress="isKorNumberKey($event)"
-                     @paste.prevent="vehicleCreateSetFieldValue('car_no', onlyKorNumberParser($event.clipboardData.getData('text')))"
+                     @input="vehicleCreateSetFieldValue('car_no', onlyKorNumberParser($event.target.value))"
+                     :value="car_no.value"
               >
               <p class="mt-2 text-sm text-gray-900">* 공백 없이 입력해주세요</p>
               <p class="mt-2 text-sm text-red-600" id="car_no-error" v-if="vehicleCreateErrors.car_no">
@@ -72,8 +72,8 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
               <input type="text" id="vin" name="vin"
                      :class="[...defaultTextInput]" maxlength="17"
-                     @keypress="isAlphaNumericKey($event)"
-                     v-bind="vin">
+                     @input="vehicleCreateSetFieldValue('vin', onlyAlphaNumericParser($event.target.value).toUpperCase())"
+                     :value="vin.value">
               <p class="mt-2 text-sm text-red-600" id="vin-error" v-if="vehicleCreateErrors.vin">
                 {{ vehicleCreateErrors.vin }}
               </p>
@@ -127,9 +127,11 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
           <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-6">
             <dt class="text-sm font-medium leading-6 text-gray-900">소유자</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
-  <!--            //'owner_party', 'user_party', 'manager_party',-->
-              <VehiclePartySelector :label-string="'차량 소유자'" @selectParty="(value) => vehicleCreateSetFieldValue('owner_party', value)"/>
-              <input type="text" id="owner_party" name="owner_party" :class="[...defaultTextInput]" v-bind="owner_party" class="hidden">
+              <!--            //'owner_party', 'user_party', 'manager_party',-->
+              <VehiclePartySelector :label-string="'차량 소유자'"
+                                    @selectParty="(value) => vehicleCreateSetFieldValue('owner_party', value)"/>
+              <input type="text" id="owner_party" name="owner_party" :class="[...defaultTextInput]" v-bind="owner_party"
+                     class="hidden">
               <p class="mt-2 text-sm text-gray-900">* 자동차 등록증상 명의자를 선택하세요</p>
               <p class="mt-2 text-sm text-red-600" id="owner_party-error" v-if="vehicleCreateErrors.owner_party">
                 {{ vehicleCreateErrors.owner_party }}
@@ -140,8 +142,10 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
             <dt class="text-sm font-medium leading-6 text-gray-900">사용자</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
 
-              <VehiclePartySelector :label-string="'차량 사용자'" @selectParty="(value) => vehicleCreateSetFieldValue('user_party', value)"/>
-              <input type="text" id="user_party" name="user_party" :class="[...defaultTextInput]" v-bind="user_party" class="hidden">
+              <VehiclePartySelector :label-string="'차량 사용자'"
+                                    @selectParty="(value) => vehicleCreateSetFieldValue('user_party', value)"/>
+              <input type="text" id="user_party" name="user_party" :class="[...defaultTextInput]" v-bind="user_party"
+                     class="hidden">
               <p class="mt-2 text-sm text-gray-900">* 실제로 차량을 업무에 사용중인 당사자를 선택하세요</p>
               <p class="mt-2 text-sm text-red-600" id="user_party-error" v-if="vehicleCreateErrors.user_party">
                 {{ vehicleCreateErrors.user_party }}
@@ -152,8 +156,10 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
             <dt class="text-sm font-medium leading-6 text-gray-900">관리자</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
 
-              <VehiclePartySelector :label-string="'차량 관리자'" @selectParty="(value) => vehicleCreateSetFieldValue('manager_party', value)"/>
-              <input type="text" id="manager_party" name="manager_party" :class="[...defaultTextInput]" v-bind="manager_party" class="hidden">
+              <VehiclePartySelector :label-string="'차량 관리자'"
+                                    @selectParty="(value) => vehicleCreateSetFieldValue('manager_party', value)"/>
+              <input type="text" id="manager_party" name="manager_party" :class="[...defaultTextInput]"
+                     v-bind="manager_party" class="hidden">
               <p class="mt-2 text-sm text-gray-900">* 차량 관리에 소요되는 비용(수리비, 보험료 등)을 부담하는 당사자를 선택하세요</p>
               <p class="mt-2 text-sm text-red-600" id="manager_party-error" v-if="vehicleCreateErrors.manager_party">
                 {{ vehicleCreateErrors.manager_party }}
@@ -165,7 +171,9 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
 
 
       <div class="mt-6 flex items-center justify-end gap-x-6">
-        <router-link :to="{name: 'vehicle_list'}" type="button" class="text-sm font-semibold leading-6 text-gray-900">취소</router-link>
+        <router-link :to="{name: 'vehicle_list'}" type="button" class="text-sm font-semibold leading-6 text-gray-900">
+          취소
+        </router-link>
         <button type="submit"
                 class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
           저장

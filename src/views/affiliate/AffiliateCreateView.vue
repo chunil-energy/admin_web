@@ -11,6 +11,7 @@ import AffiliateSelectComponent from "@/components/affiliate/AffiliateSelectComp
 import createAffiliate from "@/apis/affiliate/create";
 import isNumberKey from "@/utils/common/isNumberKey";
 import onlyDigitParser from "@/utils/common/onlyDigitParser";
+import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
 
 
 const authStore = useAuthStore()
@@ -96,7 +97,9 @@ const onSubmit = handleSubmit(async values => {
               <div class="sm:col-span-3">
                 <label for="brn" class="block text-sm font-medium leading-6 text-gray-900">사업자등록번호</label>
                 <div class="mt-2">
-                  <input type="text" name="brn" id="brn" v-bind="brn" maxlength="10" @keypress="isNumberKey($event)" @paste.prevent="setFieldValue('brn', onlyDigitParser($event.clipboardData.getData('text')))"
+                  <input type="text" name="brn" id="brn" v-bind="brn" maxlength="10"
+                         @input="setFieldValue('brn', onlyDigitParser($event.target.value))"
+                         :value="brn.value"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">10자리 숫자만 입력하세요</p>
@@ -107,7 +110,9 @@ const onSubmit = handleSubmit(async values => {
               <div class="sm:col-span-3">
                 <label for="registration_no" class="block text-sm font-medium leading-6 text-gray-900">법인등록번호</label>
                 <div class="mt-2">
-                  <input type="text" name="registration_no" id="registration_no" v-bind="registration_no" maxlength="13" @keypress="isNumberKey($event)" @paste.prevent="setFieldValue('registration_no', onlyDigitParser($event.clipboardData.getData('text')))"
+                  <input type="text" name="registration_no" id="registration_no" v-bind="registration_no" maxlength="13"
+                         @input="setFieldValue('registration_no', onlyDigitParser($event.target.value))"
+                         :value="registration_no.value"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">13자리 숫자만 입력하세요</p>
