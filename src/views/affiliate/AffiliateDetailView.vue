@@ -40,6 +40,7 @@ const brn = defineInputBinds('brn')
 const registration_no = defineInputBinds('registration_no')
 const parent = defineInputBinds('parent')
 
+
 const onSubmit = handleSubmit(async values => {
   const response = await updateAffiliate(affiliateId, values)
   if (response.success) {
@@ -61,7 +62,6 @@ const onSubmit = handleSubmit(async values => {
     </div>
 
     <div class="-mx-4 mt-10  sm:mx-0 sm:rounded-lg" v-if="affiliateData">
-      {{formErrors}}
       <form @submit.prevent="onSubmit" method="post">
         <div class="space-y-12">
           <div class="border-b border-gray-900/10 pb-12">
