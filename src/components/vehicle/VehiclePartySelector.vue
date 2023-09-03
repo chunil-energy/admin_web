@@ -266,6 +266,10 @@ export default defineComponent({
   },
   async mounted() {
     this.open = this.openProp
+    if (this.selectedVehicleParty) {
+      this.selectedParty = this.selectedVehicleParty.value
+      this.$emit('selectParty', this.selectedParty.id)
+    }
     if (this.open === true) {
       this.affiliates = await getAllAffiliateList()
     }

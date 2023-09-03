@@ -6,27 +6,20 @@ import {useRoute} from "vue-router";
 import getAffiliateList from "@/apis/affiliate/list";
 import onlyDigitParser from "@/utils/common/onlyDigitParser"
 import brnParser from "@/utils/common/brnParser";
-import corpRegisterNoParser from "../../utils/common/corpRegisterNoParser";
+import corpRegisterNoParser from "@/utils/common/corpRegisterNoParser";
 export default {
   name: 'AffiliateListView',
-  setup() {
+  async setup() {
     const authStore = useAuthStore()
     const route = useRoute()
     const currentPage = route.query.page ? parseInt(route.query.page) : 1
     const pageSize = route.query.pagesize ? parseInt(route.query.pagesize) : 20
-    return {authStore, currentPage, pageSize}
+    const affiliateData = await getAffiliateList({page: currentPage})
+    return {authStore, currentPage, pageSize, affiliateData}
   },
   components: {
     'chevron-left-icon': ChevronLeftIcon,
     'chevron-right-icon': ChevronRightIcon,
-  },
-  data() {
-    return {
-      affiliateData: null
-    }
-  },
-  async mounted() {
-    this.affiliateData = await getAffiliateList({page: this.currentPage})
   },
   methods: {
     corpRegisterNoParser,

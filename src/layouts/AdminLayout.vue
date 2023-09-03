@@ -10,19 +10,28 @@
   <div>
 
     <Transition as="template" enter="ease-in-out duration-200" enter-from="opacity-0" enter-to="opacity-100"
-                     leave="ease-in-out duration-200" leave-from="opacity-100" leave-to="opacity-0">
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity h-full" style="z-index: 9999999999999999" v-if="layoutStore.showOverlay">
+                leave="ease-in-out duration-200" leave-from="opacity-100" leave-to="opacity-0">
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity h-full" style="z-index: 9999999999999999"
+           v-if="layoutStore.showOverlay">
         <div class="flex justify-center items-center h-full">
           <div role="status">
-            <svg aria-hidden="true" class="inline w-10 h-10 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-              <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+            <svg aria-hidden="true"
+                 class="inline w-10 h-10 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"/>
+              <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill"/>
             </svg>
             <span class="sr-only">Loading...</span>
           </div>
         </div>
       </div>
     </Transition>
+    <PdfViewer v-if="layoutStore.pdfFileUrl !== null"/>
+    <ImageViewer v-if="layoutStore.imageFileUrl !== null"/>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog as="div" class="relative z-50 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0"
@@ -122,7 +131,9 @@
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-    <div :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarShow ? 'lg:w-72':'lg:w-16']" @mouseenter="() => desktopSidebarHover = true" @mouseleave="() => desktopSidebarHover = false">
+    <div
+        :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarShow ? 'lg:w-60':'lg:w-16']"
+        @mouseenter="() => desktopSidebarHover = true" @mouseleave="() => desktopSidebarHover = false">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <div class="flex h-16 shrink-0 items-center">
@@ -138,18 +149,24 @@
                                :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', desktopSidebarShow ? '' : 'justify-center', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700']">
                     <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
                     <template v-if="desktopSidebarShow">
-                    {{ item.name }}
+                      {{ item.name }}
                     </template>
                   </router-link>
                   <Disclosure as="div" v-else v-slot="{ open }">
                     <DisclosureButton
                         :class="[item.router_name === route.name ? 'bg-gray-50 text-indigo-600' : 'hover:bg-gray-50', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700', desktopSidebarShow ? '' : 'justify-center']">
-                      <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
+                      <template v-if="item.iconType === 'svg-icon'">
+                        <component :is="SvgIcon" type="mdi" :path="item.icon" class="h-6 w-6 shrink-0 text-gray-400"
+                                   aria-hidden="true"/>
+                      </template>
+                      <template v-else>
+                        <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true"/>
+                      </template>
                       <template v-if="desktopSidebarShow">
-                      {{ item.name }}
-                      <ChevronRightIcon
-                          :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'ml-auto h-5 w-5 shrink-0']"
-                          aria-hidden="true"/>
+                        {{ item.name }}
+                        <ChevronRightIcon
+                            :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'ml-auto h-5 w-5 shrink-0']"
+                            aria-hidden="true"/>
                       </template>
                     </DisclosureButton>
                     <template v-if="desktopSidebarShow">
@@ -168,12 +185,12 @@
                 </li>
                 <li>
                   <button type="button" @click="logout" :class="[desktopSidebarShow ? '' : 'justify-center']"
-                     class="text-gray-700 hover:text-indigo-600 w-full hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                          class="text-gray-700 hover:text-indigo-600 w-full hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                     <component :is="ArrowRightOnRectangleIcon"
                                :class="'text-gray-400 group-hover:text-indigo-600 h-6 w-6 shrink-0'"
                                aria-hidden="true"/>
                     <template v-if="desktopSidebarShow">
-                    로그아웃
+                      로그아웃
                     </template>
                   </button>
                 </li>
@@ -181,30 +198,31 @@
               </ul>
             </li>
           </ul>
-            <!-- teams -->
-<!--            <li v-if="desktopSidebarShow">-->
-<!--              <div class="text-xs font-semibold leading-6 text-gray-400">외부 서비스</div>-->
-<!--              <ul role="list" class="-mx-2 mt-2 space-y-1">-->
-<!--                <li v-for="team in teams" :key="team.name">-->
-<!--                  <a :href="team.href"-->
-<!--                     class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">-->
-<!--                    <span-->
-<!--                        class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">{{-->
-<!--                        team.initial-->
-<!--                      }}</span>-->
-<!--                    <span class="truncate">{{ team.name }}</span>-->
-<!--                  </a>-->
-<!--                </li>-->
-<!--              </ul>-->
-<!--            </li>-->
+          <!-- teams -->
+          <!--            <li v-if="desktopSidebarShow">-->
+          <!--              <div class="text-xs font-semibold leading-6 text-gray-400">외부 서비스</div>-->
+          <!--              <ul role="list" class="-mx-2 mt-2 space-y-1">-->
+          <!--                <li v-for="team in teams" :key="team.name">-->
+          <!--                  <a :href="team.href"-->
+          <!--                     class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">-->
+          <!--                    <span-->
+          <!--                        class="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white">{{-->
+          <!--                        team.initial-->
+          <!--                      }}</span>-->
+          <!--                    <span class="truncate">{{ team.name }}</span>-->
+          <!--                  </a>-->
+          <!--                </li>-->
+          <!--              </ul>-->
+          <!--            </li>-->
 
           <ul role="list" class="gap-y-7">
             <li class="-mx-6 mt-auto">
               <button type="button" @click="toggleDesktopSidebarLock"
-                  class="flex items-center gap-x-4 px-6 py-3 w-full text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarShow ? '' : 'justify-center']">
+                      class="flex items-center gap-x-4 px-6 py-3 w-full text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"
+                      :class="[desktopSidebarShow ? '' : 'justify-center']">
                 <template v-if="desktopSidebarLock">
-                <LockClosedIcon
-                    class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
+                  <LockClosedIcon
+                      class="text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-medium bg-white"/>
                 </template>
                 <template v-else>
                   <LockOpenIcon
@@ -225,7 +243,8 @@
             </li>
             <li class="-mx-6 mt-auto">
               <router-link :to="{name: 'profile'}"
-                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50" :class="[desktopSidebarShow ? '' : 'justify-center']">
+                           class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"
+                           :class="[desktopSidebarShow ? '' : 'justify-center']">
                 <!--                <img class="h-8 w-8 rounded-full bg-gray-50"-->
                 <!--                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"-->
                 <!--                     alt=""/>-->
@@ -265,10 +284,12 @@
       </router-link>
     </div>
 
-    <main class="py-10" :class="['py-10', desktopSidebarShow ? 'lg:pl-72' : 'lg:pl-16']">
+    <main class="py-10" :class="['py-10', desktopSidebarShow ? 'lg:pl-60' : 'lg:pl-16']">
       <div class="px-4 sm:px-6 lg:px-8">
         <!-- Your content -->
-        <router-view/>
+        <Suspense>
+          <router-view/>
+        </Suspense>
       </div>
     </main>
   </div>
@@ -279,7 +300,10 @@
 import {computed, onMounted, ref} from 'vue'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
-import {ChevronRightIcon, LockOpenIcon, LockClosedIcon} from '@heroicons/vue/20/solid'
+import {ChevronRightIcon, LockOpenIcon, LockClosedIcon,} from '@heroicons/vue/20/solid'
+
+import SvgIcon from '@jamescoyle/vue-icon';
+import {mdiTruckFastOutline} from '@mdi/js';
 
 import {
   Bars3Icon,
@@ -287,19 +311,33 @@ import {
   XMarkIcon,
   TruckIcon,
   HomeModernIcon,
-  ArrowRightOnRectangleIcon
+  UserGroupIcon,
+  ArrowRightOnRectangleIcon,
+  UsersIcon
 } from '@heroicons/vue/24/outline'
 import {RouterLink, useRoute} from "vue-router";
 import {useAuthStore} from "@/stores/auth";
 import NotificationListComponent from "@/components/NotificationList.vue";
 import {useLayoutStore} from "@/stores/layout";
+import PdfViewer from "@/components/common/PdfViewer.vue";
+import ImageViewer from "@/components/common/ImageViewer.vue";
 
 const route = useRoute()
 
 const navigation = [
   {name: 'Home', router_name: 'home', icon: HomeIcon},
   {
-    name: '사업장관리',
+    name: '사용자/임직원 관리',
+    icon: UserGroupIcon,
+    children: [
+      {name: '사용자 목록', router_name: 'user_list'},
+      {name: '임직원 목록', router_name: 'employee_list'},
+      // { name: 'Human Resources', href: '#' },
+      // { name: 'Customer Success', href: '#' },
+    ],
+  },
+  {
+    name: '사업장 관리',
     icon: HomeModernIcon,
     children: [
       {name: '사업장 목록', router_name: 'affiliate_list'},
@@ -308,10 +346,21 @@ const navigation = [
     ],
   },
   {
-    name: '차량/기사관리',
+    name: '차량/기사 관리',
     icon: TruckIcon,
     children: [
-      {name: '차량목록', router_name: 'vehicle_list'},
+      {name: '차량 목록', router_name: 'vehicle_list'},
+      // { name: 'Human Resources', href: '#' },
+      // { name: 'Customer Success', href: '#' },
+    ],
+  },
+  {
+    name: '소형 수집운반',
+    iconType: 'svg-icon',
+    icon: mdiTruckFastOutline,
+    children: [
+      {name: '거래처 목록', router_name: 'collection_company_list'},
+      {name: '기본단가 관리', router_name: 'collection_price'},
       // { name: 'Human Resources', href: '#' },
       // { name: 'Customer Success', href: '#' },
     ],
@@ -352,7 +401,7 @@ const logout = () => {
 const sidebarOpen = ref(false)
 
 const desktopSidebarLockStorage = localStorage.getItem('desktopSidebarLock')
-const desktopSidebarLock = ref(desktopSidebarLockStorage ? JSON.parse(desktopSidebarLockStorage):true)
+const desktopSidebarLock = ref(desktopSidebarLockStorage ? JSON.parse(desktopSidebarLockStorage) : true)
 const desktopSidebarHover = ref(false)
 const desktopSidebarShow = computed(() => {
   let show = true

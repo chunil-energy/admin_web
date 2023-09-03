@@ -39,7 +39,6 @@ export const useAuthStore = defineStore({
             if (JWTexpire <= now) {
                 // console.log('EXPIRED')
                 try {
-                    const errorState = useErrorStore()
                     const refreshOption = {
                         method: 'POST',
                         url: refreshUrl,
@@ -63,7 +62,7 @@ export const useAuthStore = defineStore({
                     }
                 } catch (e) {
                     this.clearState()
-                    errorState.set('error', '인증 갱신 실패', e.toString())
+                    await errorState.set('error', '인증 갱신 실패', e.toString())
                 }
             } else {
                 // console.log('UNEXPIRED')
@@ -87,13 +86,13 @@ export const useAuthStore = defineStore({
                     this.accessToken = refreshResponseData.access;
                     localStorage.setItem('accessToken', refreshResponseData.access)
                 } else if (refreshResponse.status === 401) {
-                    errorState.set('error', '인증 실패', '로그인이 필요한 서비스입니다.')
+                    await errorState.set('error', '인증 실패', '로그인이 필요한 서비스입니다.')
                     this.logout()
                 } else if (refreshResponse.status === 403) {
-                    errorState.set('error', '인증 실패', '권한이 없습니다.')
+                    await errorState.set('error', '인증 실패', '권한이 없습니다.')
                 }
             } catch (e) {
-                errorState.set('error', '인증 갱신 실패', e.toString())
+                await errorState.set('error', '인증 갱신 실패', e.toString())
                 this.logout()
             }
         },
@@ -122,12 +121,12 @@ export const useAuthStore = defineStore({
                     await this.setProfile()
                     router.push(this.returnUrl || '/');
                 } else if (response.status === 401) {
-                    errorState.set('error', '로그인 실패', '아이디와 비밀번호를 확인하세요.')
+                    await errorState.set('error', '로그인 실패', '아이디와 비밀번호를 확인하세요.')
                 } else if (response.status === 403) {
-                    errorState.set('error', '로그인 실패', '해당 계정은 이 서비스에 접근할 권한이 없습니다.')
+                    await errorState.set('error', '로그인 실패', '해당 계정은 이 서비스에 접근할 권한이 없습니다.')
                 }
             } catch (e) {
-                errorState.set('error', '로그인 실패', e.toString())
+                await errorState.set('error', '로그인 실패', e.toString())
             }
         },
         async setProfile() {
@@ -146,7 +145,7 @@ export const useAuthStore = defineStore({
                 const responseData = response.data
                 this.setProfileData(responseData)
             } catch (e) {
-                errorState.set('error', '프로필 정보 조회에 실패했습니다.', e.toString())
+                await errorState.set('error', '프로필 정보 조회에 실패했습니다.', e.toString())
             }
         },
         setProfileData(data) {

@@ -45,9 +45,9 @@ const parent = defineInputBinds('parent')
 const onSubmit = handleSubmit(async values => {
   const response = await updateAffiliate(affiliateId, values)
   if (response.success) {
-    errorStore.set('success', '성공', '수정사항이 저장되었습니다.')
+    await errorStore.set('success', '성공', '수정사항이 저장되었습니다.')
   } else {
-    errorStore.set('error', '실패', response.message)
+    await errorStore.set('error', '실패', response.message)
   }
 });
 

@@ -20,12 +20,12 @@ const createVehicle = async (data) => {
         }
         const response = await axios.request(option)
         if (response.status === 403) {
-            errorStore.set('error', '권한 오류', '차량을 등록할 권한이 없습니다.')
+            await errorStore.set('error', '권한 오류', '차량을 등록할 권한이 없습니다.')
             return null
         }
         return response.data
     } catch (e) {
-        errorStore.set('error', '등록 실패', `차량 등록중 오류가 발생했습니다. ${e}`)
+        await errorStore.set('error', '등록 실패', `차량 등록중 오류가 발생했습니다. ${e}`)
         return null
     } finally {
         layoutStore.overlayOff()

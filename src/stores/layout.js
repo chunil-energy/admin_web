@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
+import {useViewerStore} from "@/stores/viewer";
 
 export const useLayoutStore = defineStore({
     id: 'layout',
     state: () => ({
         showOverlay: localStorage.getItem('showOverlay') ? JSON.parse(localStorage.getItem('showOverlay')):false,
+        pdfFileUrl: null,
+        imageFileUrl: null
     }),
     actions: {
         overlayOn() {
@@ -17,6 +20,18 @@ export const useLayoutStore = defineStore({
         overlayToggle() {
             this.showOverlay = !this.showOverlay
             localStorage.setItem('showOverlay', JSON.stringify(this.showOverlay))
+        },
+        showPdfFileViewer(pdfUrl) {
+            this.pdfFileUrl = pdfUrl
+        },
+        showImageFileViewer(imageUrl) {
+            this.imageFileUrl = imageUrl
+        },
+        closeViewer() {
+            this.pdfFileUrl = null
+            this.imageFileUrl = null
+            const viewerStore = useViewerStore()
+            viewerStore.clearStore()
         }
     }
 });

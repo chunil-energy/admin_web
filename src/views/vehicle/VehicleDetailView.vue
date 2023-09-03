@@ -1,154 +1,254 @@
-<script>
-import {useAuthStore} from "@/stores/auth";
-import axios from "axios";
-import {onMounted, ref} from "vue";
+<script setup>
+import {vehiclePositionChoice, vehicleTypeChoice} from "@/choices/vehicle";
+import {defaultSelect, defaultTextInput} from "@/styles"
+import {CheckCircleIcon, XCircleIcon} from '@heroicons/vue/24/outline'
+import VehiclePartySelector from "@/components/vehicle/VehiclePartySelector.vue";
+import {useForm} from "vee-validate";
+import {useRoute, useRouter} from "vue-router";
+import {useErrorStore} from "@/stores/error";
+import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
+import onlyAlphaNumericParser from "@/utils/common/onlyAlphaNumericParser";
+import getVehicle from "@/apis/vehicle/get";
+import updateVehicle from "@/apis/vehicle/update";
+import vehicleUpdateSchema from "@/validators/vehicle/update";
+import phoneNumberParser from "@/utils/common/phoneNumberParser";
+import dateRangeParser from "@/utils/common/dateRangeParser";
+import DriverAssignComponent from "@/components/vehicle/DriverAssignComponent.vue";
 
-import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
-import {useRoute} from "vue-router";
-import vehicleTypeParser from "@/utils/vehicle/vehicleTypeParser";
-import vehiclePositionParser from "@/utils/vehicle/vehiclePositionParser";
-import vehicleVehicleDriverParser from "@/utils/vehicle/vehicleVehicleDriverParser";
+const router = useRouter()
+const errorStore = useErrorStore()
+const route = useRoute()
+const vehicleId = route.params.vehicleId
 
-export default {
-  setup() {
-    const authStore = useAuthStore()
-    const route = useRoute()
-    const vehicleId = route.params.vehicleId
-    return {authStore, route, vehicleId}
-  },
-  components: {
-    'chevron-left-icon': ChevronLeftIcon,
-    'chevron-right-icon': ChevronRightIcon,
-  },
-  data() {
-    return {
-      vehicleData: null
-    }
-  },
-  async mounted() {
-    this.vehicleData = await this.getVehicleData()
-  },
-  methods: {
-    vehicleVehicleDriverParser,
-    vehiclePositionParser,
-    vehicleTypeParser,
-    async getVehicleData() {
-      await this.authStore.tokenRefresh()
-      const vehicleUrl = `${import.meta.env.VITE_API_URL}/api/admin/v1/vehicle/${this.vehicleId}`;
-      const option = {
-        method: 'get', url: vehicleUrl, headers: {Authorization: `Bearer ${this.authStore.accessToken}`}
-      }
-      const response = await axios.request(option)
-      return response.data
-    }
-  }
-}
+const vehicleData = await getVehicle(vehicleId)
+
+const {
+  values: vehicleUpdateValues,
+  errors: vehicleUpdateErrors,
+  handleSubmit: vehicleUpdateHandleSubmit,
+  defineInputBinds: vehicleUpdateDefineInputBind,
+  setFieldValue: vehicleUpdateSetFieldValue,
+  setErrors: vehicleUpdateSetSetError,
+} = useForm({validationSchema: vehicleUpdateSchema, initialValues: vehicleData.data});
+
+const car_no = vehicleUpdateDefineInputBind('car_no')
+const vin = vehicleUpdateDefineInputBind('vin')
+const name = vehicleUpdateDefineInputBind('name')
+const position = vehicleUpdateDefineInputBind('position')
+const vehicle_type = vehicleUpdateDefineInputBind('vehicle_type')
+const owner_party = vehicleUpdateDefineInputBind('owner_party')
+const user_party = vehicleUpdateDefineInputBind('user_party')
+const manager_party = vehicleUpdateDefineInputBind('manager_party')
+
+const onSubmit = vehicleUpdateHandleSubmit(async values => {
+  const response = await updateVehicle(vehicleId, values)
+  await errorStore.set('success', '성공', `${response.data.car_no} 변경사항이 저장되었습니다.`)
+  await router.push({name: 'vehicle_detail', params: {vehicleId: response.data.id}})
+});
 
 
 </script>
 
 <template>
-  <!--  <div class="px-4 sm:px-6 lg:px-8" v-if="vehicleData">-->
-  <!--    <div class="sm:flex sm:items-center">-->
-  <!--      <div class="sm:flex-auto">-->
-  <!--        <h1 class="text-base font-semibold leading-6 text-gray-900"></h1>-->
-  <!--        <p class="mt-2 text-sm text-gray-700">Your team is on the <strong-->
-  <!--            class="font-semibold text-gray-900">Startup</strong> vehicle. The next payment of $80 will be due on August 4,-->
-  <!--          2022.</p>-->
-  <!--      </div>-->
-  <!--      <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">-->
-  <!--        <button type="button"-->
-  <!--                class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">-->
-  <!--          신규 차량 등록-->
-  <!--        </button>-->
-  <!--      </div>-->
-  <!--    </div>-->
-  <!--    <div class="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg">-->
-  <!--      {{vehicleData}}-->
-  <!--    </div>-->
-  <!--  </div>-->
-  {{ vehicleData }}
-  <div class="overflow-hidden bg-white shadow sm:rounded-lg" v-if="vehicleData">
-    <div class="px-4 py-6 sm:px-6">
-      <h3 class="text-base font-semibold leading-7 text-gray-900">{{ vehicleData.car_no }} 차량상세</h3>
-<!--      <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-base font-semibold leading-6 text-gray-900">{{ vehicleData.data.car_no }} /
+          {{ vehicleData.data.name }}</h1>
+      </div>
     </div>
-    <div class="border-t border-gray-100">
-      <dl class="grid grid-cols-1 sm:grid-cols-4">
-        <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-6">
-          <dt class="text-sm font-medium leading-6 text-gray-900">차량번호</dt>
-          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{vehicleData.car_no}}</dd>
-        </div>
-        <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-6">
-          <dt class="text-sm font-medium leading-6 text-gray-900">차명</dt>
-          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{vehicleData.name}}</dd>
-        </div>
-        <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-6">
-          <dt class="text-sm font-medium leading-6 text-gray-900">차량타입</dt>
-          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ vehicleTypeParser(vehicleData.vehicle_type) }}</dd>
-        </div>
-        <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-6">
-          <dt class="text-sm font-medium leading-6 text-gray-900">용도</dt>
-          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ vehiclePositionParser(vehicleData.position) }}</dd>
-        </div>
-      </dl>
-      <dl class="divide-y divide-gray-100 border-t border-gray-100">
-<!--        <div class="grid grid-cols-1 px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">-->
-<!--          <dt class="text-sm font-medium text-gray-900">Full name</dt>-->
-<!--          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">Margot Foster</dd>-->
-<!--        </div>-->
-<!--        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">-->
-<!--          <dt class="text-sm font-medium text-gray-900">Application for</dt>-->
-<!--          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">Backend Developer</dd>-->
-<!--        </div>-->
-<!--        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">-->
-<!--          <dt class="text-sm font-medium text-gray-900">Email address</dt>-->
-<!--          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">margotfoster@example.com</dd>-->
-<!--        </div>-->
-<!--        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">-->
-<!--          <dt class="text-sm font-medium text-gray-900">Salary expectation</dt>-->
-<!--          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">$120,000</dd>-->
-<!--        </div>-->
-<!--        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">-->
-<!--          <dt class="text-sm font-medium text-gray-900">About</dt>-->
-<!--          <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">Fugiat ipsum ipsum deserunt culpa aute-->
-<!--            sint do nostrud anim incididunt cillum culpa consequat. Excepteur qui ipsum aliquip consequat sint. Sit id-->
-<!--            mollit nulla mollit nostrud in ea officia proident. Irure nostrud pariatur mollit ad adipisicing-->
-<!--            reprehenderit deserunt qui eu.-->
-<!--          </dd>-->
-<!--        </div>-->
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium leading-6 text-gray-900">자동차보험</dt>
-          <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-              <li v-for="insurance in vehicleData.insurance_list" v-bind:key="insurance.id" class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                <div class="flex w-0 flex-1 items-center">
-                  <PaperClipIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true"/>
-                  <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                    <span class="truncate font-medium">{{insurance.insurer_display}}</span>
-                    <span class="flex-shrink-0 text-gray-400">{{insurance.insurance_duration_list[0]}} ~ {{insurance.insurance_duration_list[1]}}</span>
-                  </div>
+    <div class="-mx-4 mt-10 mb-10  sm:mx-0 sm:rounded-lg">
+      <div>
+        <h2 class="text-base font-semibold leading-7 text-gray-900">기본정보</h2>
+      </div>
+      <form @submit.prevent="onSubmit" method="post">
+        <div class="border-b border-gray-900/10 pb-12">
+          <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
+            <div class="sm:col-span-2">
+              <label for="car_no" class="block text-sm font-medium leading-6 text-gray-900">차량번호</label>
+              <div class="mt-2">
+                <input type="text" id="car_no" name="car_no" :class="[...defaultTextInput]"
+                       @input="vehicleUpdateSetFieldValue('car_no', onlyKorNumberParser($event.target.value))"
+                       :value="car_no.value"
+                >
+              </div>
+              <p class="mt-2 text-sm text-gray-900">* 공백 없이 입력해주세요</p>
+              <p class="mt-2 text-sm text-red-600" id="car_no-error" v-if="vehicleUpdateErrors.car_no">
+                {{ vehicleUpdateErrors.car_no }}
+              </p>
+            </div>
+            <div class="sm:col-span-4">
+              <label for="vin" class="block text-sm font-medium leading-6 text-gray-900">차대번호</label>
+              <div class="mt-2">
+                <div type="text" id="vin"
+                     :class="['block', 'w-full', 'border-0', 'py-1.5', 'text-gray-900', 'placeholder:text-gray-400', 'sm:text-sm', 'sm:leading-6']">
+                  {{ vin.value }}
                 </div>
-                <div class="ml-4 flex-shrink-0">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
-                </div>
-              </li>
-              <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                <div class="flex w-0 flex-1 items-center">
-                  <PaperClipIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true"/>
-                  <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                    <span class="truncate font-medium">coverletter_back_end_developer.pdf</span>
-                    <span class="flex-shrink-0 text-gray-400">dd</span>
-                  </div>
-                </div>
-                <div class="ml-4 flex-shrink-0">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
-                </div>
-              </li>
-            </ul>
-          </dd>
+              </div>
+              <p class="mt-2 text-sm text-red-600" id="vin-error" v-if="vehicleUpdateErrors.vin">
+                {{ vehicleUpdateErrors.vin }}
+              </p>
+            </div>
+            <div class="sm:col-span-3">
+              <label for="name" class="block text-sm font-medium leading-6 text-gray-900">차명</label>
+              <div class="mt-2">
+                <input type="text" id="name" name="name" :class="[...defaultTextInput]" placeholder="현대 포터"
+                       v-bind="name">
+              </div>
+              <p class="mt-2 text-sm text-red-600" id="name-error" v-if="vehicleUpdateErrors.name">
+                {{ vehicleUpdateErrors.name }}
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9 border-b pb-10">
+            <div class="sm:col-span-3">
+              <label for="vehicle_type" class="block text-sm font-medium leading-6 text-gray-900">차량타입</label>
+              <div class="mt-2">
+                <select id="vehicle_type" name="vehicle_type" :class="[...defaultSelect]" v-bind="vehicle_type">
+                  <option value="">선택</option>
+                  <template v-for="[vehicleTypeValue, vehicleTypeName] in Object.entries(vehicleTypeChoice)"
+                            v-bind:key="vehicleTypeValue">
+                    <option :value="vehicleTypeValue">{{ vehicleTypeName }}</option>
+                  </template>
+                </select>
+              </div>
+              <p class="mt-2 text-sm text-red-600" id="position-error" v-if="vehicleUpdateErrors.vehicle_type">
+                {{ vehicleUpdateErrors.vehicle_type }}
+              </p>
+            </div>
+            <div class="sm:col-span-3">
+              <label for="position" class="block text-sm font-medium leading-6 text-gray-900">용도</label>
+              <div class="mt-2">
+                <select id="position" name="position" :class="[...defaultSelect]" v-bind="position">
+                  <option value="">선택</option>
+                  <template
+                      v-for="[vehiclePositionValue, vehiclePositionName] in Object.entries(vehiclePositionChoice)"
+                      v-bind:key="vehiclePositionValue">
+                    <option :value="vehiclePositionValue">{{ vehiclePositionName }}</option>
+                  </template>
+                </select>
+              </div>
+              <p class="mt-2 text-sm text-red-600" id="vehicle_type-error" v-if="vehicleUpdateErrors.position">
+                {{ vehicleUpdateErrors.position }}
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
+            <div class="sm:col-span-3">
+              <label for="owner_party" class="block text-sm font-medium leading-6 text-gray-900">소유자</label>
+              <div class="mt-2">
+                <VehiclePartySelector :label-string="'차량 소유자'" :selected-vehicle-party="owner_party"
+                                      @selectParty="(value) => vehicleUpdateSetFieldValue('owner_party', value)"/>
+                <!--                  <input type="text" id="owner_party" name="owner_party" :class="[...defaultTextInput]" v-bind="owner_party"-->
+                <!--                         class="hidden">-->
+              </div>
+              <p class="mt-2 text-sm text-gray-900">* 자동차 등록증상 명의자를 선택하세요</p>
+              <p class="mt-2 text-sm text-red-600" id="owner_party-error" v-if="vehicleUpdateErrors.owner_party">
+                {{ vehicleUpdateErrors.owner_party }}
+              </p>
+            </div>
+            <div class="sm:col-span-3">
+              <label for="user_party" class="block text-sm font-medium leading-6 text-gray-900">소유자</label>
+              <div class="mt-2">
+
+                <VehiclePartySelector :label-string="'차량 사용자'" :selected-vehicle-party="user_party"
+                                      @selectParty="(value) => vehicleUpdateSetFieldValue('user_party', value)"/>
+                <!--                  <input type="text" id="user_party" name="user_party" :class="[...defaultTextInput]" v-bind="user_party"-->
+                <!--                         class="hidden">-->
+              </div>
+              <p class="mt-2 text-sm text-gray-900">* 실제로 차량을 업무에 사용중인 당사자를 선택하세요</p>
+              <p class="mt-2 text-sm text-red-600" id="user_party-error" v-if="vehicleUpdateErrors.user_party">
+                {{ vehicleUpdateErrors.user_party }}
+              </p>
+            </div>
+            <div class="sm:col-span-3">
+              <label for="manager_party" class="block text-sm font-medium leading-6 text-gray-900">관리자</label>
+              <div class="mt-2">
+
+                <VehiclePartySelector :label-string="'차량 관리자'" :selected-vehicle-party="manager_party"
+                                      @selectParty="(value) => vehicleUpdateSetFieldValue('manager_party', value)"/>
+                <!--                  <input type="text" id="manager_party" name="manager_party" :class="[...defaultTextInput]"-->
+                <!--                         v-bind="manager_party" class="hidden">-->
+              </div>
+              <p class="mt-2 text-sm text-gray-900">* 차량 관리에 소요되는 비용(수리비, 보험료 등)을 부담하는 당사자를 선택하세요</p>
+              <p class="mt-2 text-sm text-red-600" id="manager_party-error"
+                 v-if="vehicleUpdateErrors.manager_party">
+                {{ vehicleUpdateErrors.manager_party }}
+              </p>
+            </div>
+          </div>
         </div>
-      </dl>
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+          <router-link :to="{name: 'vehicle_list'}" type="button" class="text-sm font-semibold leading-6 text-gray-900">
+            취소
+          </router-link>
+          <button type="submit"
+                  class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            저장
+          </button>
+        </div>
+      </form>
+    </div>
+    <hr class="border border-gray-300">
+    <div class="-mx-4 mt-10 mb-10 sm:mx-0 sm:rounded-lg">
+      <div>
+        <div><h2 class="text-base font-semibold leading-7 text-gray-900">기사정보</h2></div>
+      </div>
+      <div class="my-3">
+        <div class="text-sm font-semibold text-gray-900">기사 배정</div>
+        <DriverAssignComponent :vehicle-data="vehicleData"/>
+      </div>
+      <div class="flow-root">
+        <div class="-mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead>
+              <tr>
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">기사</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">휴대전화</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">배정일</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">해제일</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">현행</th>
+              </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+              <tr v-for="vehicleDriver in vehicleData.data.vehicle_driver_set" :key="vehicleDriver.id">
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0"
+                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">{{
+                    vehicleDriver.driver_user_name ? `${vehicleDriver.driver_user_name}(${vehicleDriver.driver_user_username})` : vehicleDriver.driver_user_username
+                  }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm"
+                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
+                  {{
+                    vehicleDriver.driver_user_cellphone ? phoneNumberParser(vehicleDriver.driver_user_cellphone) : '-'
+                  }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm"
+                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
+                  {{ dateRangeParser(vehicleDriver.assign_date_range)[0] }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm"
+                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
+                  {{ dateRangeParser(vehicleDriver.assign_date_range)[1] }}
+                </td>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-sm font-medium sm:pr-0">
+                  <CheckCircleIcon class="h-5 w-5 text-green-400" v-if="vehicleDriver.current"/>
+                  <XCircleIcon class="h-5 w-5 text-red-400" v-if="!vehicleDriver.current"/>
+                </td>
+                <!--                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">-->
+                <!--                  <a href="#" class="text-indigo-600 hover:text-indigo-900"-->
+                <!--                  >Edit<span class="sr-only">, {{ vehicleDriver.name }}</span></a-->
+                <!--                  >-->
+                <!--                </td>-->
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
+

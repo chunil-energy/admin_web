@@ -10,6 +10,21 @@ import AffiliateListView from "@/views/affiliate/AffiliateListView.vue";
 import AffiliateCreateView from "@/views/affiliate/AffiliateCreateView.vue";
 import AffiliateDetailView from "@/views/affiliate/AffiliateDetailView.vue";
 import VehicleCreateView from "@/views/vehicle/VehicleCreateView.vue";
+import CompanyListView from "@/views/collection/company/CompanyListView.vue";
+import CompanyCreateView from "@/views/collection/company/CompanyCreateView.vue";
+import CompanyDetailView from "@/views/collection/company/CompanyDetailView.vue";
+import BasePrice from "@/views/collection/BasePriceView.vue";
+import BasePriceView from "@/views/collection/BasePriceView.vue";
+import CompanyPriceTableView from "@/views/collection/company/CompanyPriceTableView.vue";
+import CompanyUserView from "@/views/collection/company/CompanyUserView.vue";
+import CompanyUserCreate from "@/views/collection/company/CompanyUserCreate.vue";
+import CompanyUserDetail from "@/views/collection/company/CompanyUserDetail.vue";
+import EmployeeListView from "@/views/employee/EmployeeListView.vue";
+import EmployeeCreateView from "@/views/employee/EmployeeCreateView.vue";
+import UserListView from "@/views/employee/UserListView.vue";
+import UserCreateView from "@/views/employee/UserCreateView.vue";
+import UserDetailView from "@/views/employee/UserDetailView.vue";
+import EmployeeDetailView from "@/views/employee/EmployeeDetailView.vue";
 
 
 const router = createRouter({
@@ -39,6 +54,42 @@ const router = createRouter({
           name: 'profile',
           component: ProfleView,
           meta: {name: '프로필', requireAuth: true}
+        },
+        {
+          path: '/employee/user',
+          name: 'user_list',
+          component: UserListView,
+          meta: {name: '사용자 목록', requireAuth: true}
+        },
+        {
+          path: '/employee/user/create',
+          name: 'user_create',
+          component: UserCreateView,
+          meta: {name: '사용자 등록', requireAuth: true}
+        },
+        {
+          path: '/employee/user/:userId',
+          name: 'user_detail',
+          component: UserDetailView,
+          meta: {name: '사용자 조회', requireAuth: true}
+        },
+        {
+          path: '/employee/user/:userId/create',
+          name: 'employee_create',
+          component: EmployeeCreateView,
+          meta: {name: '임직원 상세 등록', requireAuth: true}
+        },
+        {
+          path: '/employee',
+          name: 'employee_list',
+          component: EmployeeListView,
+          meta: {name: '임직원 목록', requireAuth: true}
+        },
+        {
+          path: '/employee/:employeeId',
+          name: 'employee_detail',
+          component: EmployeeDetailView,
+          meta: {name: '임직원 상세', requireAuth: true}
         },
         {
           path: '/affiliate',
@@ -75,6 +126,54 @@ const router = createRouter({
           name: 'vehicle_detail',
           component: VehicleDetailView,
           meta: {name: '차량상세', requireAuth: true}
+        },
+        {
+          path: '/collection/company',
+          name: 'collection_company_list',
+          component: CompanyListView,
+          meta: {name: '거래처', requireAuth: true}
+        },
+        {
+          path: '/collection/company/create',
+          name: 'collection_company_create',
+          component: CompanyCreateView,
+          meta: {name: '거래처 등록', requireAuth: true}
+        },
+        {
+          path: '/collection/company/:companyId',
+          name: 'collection_company_detail',
+          component: CompanyDetailView,
+          meta: {name: '거래처 기본정보', requireAuth: true}
+        },
+        {
+          path: '/collection/company/:companyId/user',
+          name: 'collection_company_user',
+          component: CompanyUserView,
+          meta: {name: '거래처 직원', requireAuth: true}
+        },
+        {
+          path: '/collection/company/:companyId/user/:userId',
+          name: 'collection_company_user_detail',
+          component: CompanyUserDetail,
+          meta: {name: '거래처 직원 상세', requireAuth: true}
+        },
+        {
+          path: '/collection/company/:companyId/user/create',
+          name: 'collection_company_user_create',
+          component: CompanyUserCreate,
+          meta: {name: '거래처 등록', requireAuth: true}
+        },
+        {
+          path: '/collection/company/:companyId/price',
+          name: 'collection_company_price',
+          component: CompanyPriceTableView,
+          meta: {name: '거래처 기본단가', requireAuth: true}
+        },
+        {
+          path: '/collection/price',
+          name: 'collection_price',
+          component: BasePriceView,
+          meta: {name: '기본단가 관리', requireAuth: true}
         },
       ],
       meta: {

@@ -1,24 +1,22 @@
 <script setup>
 import {useAuthStore} from "@/stores/auth";
 import {useRoute, useRouter} from "vue-router";
-import getAffiliate from "@/apis/affiliate/get";
 import {Form, useForm} from 'vee-validate';
-import affiliateCreateSchema from "@/validators/affiliate/create";
 import {useErrorStore} from "@/stores/error";
-import {onMounted, ref} from "vue";
-import updateAffiliate from "@/apis/affiliate/update";
 import AffiliateSelectComponent from "@/components/affiliate/AffiliateSelectComponent.vue";
 import createAffiliate from "@/apis/affiliate/create";
-import isNumberKey from "@/utils/common/isNumberKey";
 import onlyDigitParser from "@/utils/common/onlyDigitParser";
 import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
+import affiliateCreateSchema from "@/validators/affiliate/create";
 
 
 const authStore = useAuthStore()
 const errorStore = useErrorStore()
 const router = useRouter()
 
-const { values: formValues, errors: formErrors, handleSubmit, defineInputBinds, setFieldValue  } = useForm({validationSchema: affiliateCreateSchema});
+const {
+  values: formValues, errors: formErrors, handleSubmit, defineInputBinds, setFieldValue
+} = useForm({validationSchema: affiliateCreateSchema});
 
 const name = defineInputBinds('name')
 const name_legal = defineInputBinds('name_legal')
@@ -31,7 +29,7 @@ const parent = defineInputBinds('parent')
 const onSubmit = handleSubmit(async values => {
   const response = await createAffiliate(values)
   if (response.success) {
-    errorStore.set('success', '등록 성공', `${response.data.name}이 등록되었습니다.`)
+    await errorStore.set('success', '등록 성공', `${response.data.name}이 등록되었습니다.`)
     await router.push({name: 'affiliate_detail', params: {affiliateId: response.data.id}})
   } else {
 
@@ -51,9 +49,7 @@ const onSubmit = handleSubmit(async values => {
     <div class="-mx-4 mt-10  sm:mx-0 sm:rounded-lg">
       <form @submit.prevent="onSubmit" method="post">
         <div class="space-y-12">
-
           <div class="border-b border-gray-900/10 pb-12">
-
             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div class="sm:col-span-3">
                 <label for="name_legal" class="block text-sm font-medium leading-6 text-gray-900">법인명</label>
@@ -65,7 +61,6 @@ const onSubmit = handleSubmit(async values => {
                 <p class="mt-2 text-sm text-red-600" id="name_legal-error" v-if="formErrors.name_legal">
                   {{formErrors.name_legal}}
                 </p>
-
               </div>
               <div class="sm:col-span-3">
                 <label for="name" class="block text-sm font-medium leading-6 text-gray-900">사업장명</label>
@@ -79,7 +74,6 @@ const onSubmit = handleSubmit(async values => {
                 </p>
               </div>
             </div>
-
             <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div class="sm:col-span-3">
                 <label for="rep" class="block text-sm font-medium leading-6 text-gray-900">대표자명</label>
@@ -92,7 +86,6 @@ const onSubmit = handleSubmit(async values => {
                 </p>
               </div>
             </div>
-
             <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div class="sm:col-span-3">
                 <label for="brn" class="block text-sm font-medium leading-6 text-gray-900">사업자등록번호</label>
@@ -121,14 +114,12 @@ const onSubmit = handleSubmit(async values => {
                 </p>
               </div>
             </div>
-
             <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div class="sm:col-span-3">
                 <AffiliateSelectComponent @setAffiliateId="(affData) => {setFieldValue('parent', affData)}" :label-string="'주사업장'" :request-query="{parent: 'N'}"/>
                 <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">
               </div>
             </div>
-
           </div>
         </div>
 

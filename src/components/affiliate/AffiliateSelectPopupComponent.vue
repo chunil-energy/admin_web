@@ -244,6 +244,6 @@ export default defineComponent({
 
 
 import {TransitionChild, TransitionRoot} from "@headlessui/vue";
-import brnParser from "../../utils/common/brnParser";
-import corpRegisterNoParser from "../../utils/common/corpRegisterNoParser";
+import brnParser from "@/utils/common/brnParser";
+import corpRegisterNoParser from "@/utils/common/corpRegisterNoParser";
 </script>

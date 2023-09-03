@@ -20,7 +20,7 @@ const createAffiliate = async (data) => {
         }
         const response = await axios.request(option)
         if (response.status === 403) {
-            errorStore.set('error', '권한 오류', '사업장 등록 권한이 없습니다.')
+            await errorStore.set('error', '권한 오류', '사업장 등록 권한이 없습니다.')
             return {success: false, message: '사업장 등록 권한이 없습니다.'}
         }
         if (response.status === 400) {
@@ -28,7 +28,7 @@ const createAffiliate = async (data) => {
         }
         return {success: true, data: response.data}
     } catch (e) {
-        errorStore.set('error', '등록 실패', `사업장 등록중 오류가 발생했습니다. ${e}`)
+        await errorStore.set('error', '등록 실패', `사업장 등록중 오류가 발생했습니다. ${e}`)
         return {success: false, message: `사업장 등록중 오류가 발생했습니다. ${e}`}
     } finally {
         layoutStore.overlayOff()

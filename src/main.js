@@ -7,13 +7,15 @@ import utc from 'dayjs/plugin/utc'
 import 'dayjs/locale/ko';
 import App from './App.vue'
 import router from './router'
+import '@vuepic/vue-datepicker/dist/main.css'
 import "./assets/main.css";
+
+
 dayjs.extend(utc)
 dayjs.locale('ko')
 
 const app = createApp(App)
 app.config.globalProperties.$dayjs = dayjs
-
 app.use(createPinia())
 app.use(router)
 
