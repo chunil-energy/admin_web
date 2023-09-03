@@ -24,6 +24,7 @@ import dateParser from "@/utils/common/dateParser";
 import BankAccountComponent from "@/components/common/BankAccountComponent.vue"
 import createEmployee from "@/apis/employee/createEmployee";
 import {ref} from "vue";
+import getUser from "@/apis/employee/getUser";
 
 export default {
   name: 'EmployeeCreateView',
@@ -32,7 +33,7 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const userId = route.params.userId
-    const userDataResponse = await getEmployee(userId)
+    const userDataResponse = await getUser(userId)
     const userData = ref(null)
     if (userDataResponse.success) {
       userData.value = userDataResponse.data
