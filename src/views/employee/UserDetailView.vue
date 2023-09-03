@@ -10,7 +10,7 @@ import getUserListData from "@/apis/employee/listUser";
 import {useErrorStore} from "@/stores/error";
 import VehiclePartySelector from "@/components/vehicle/VehiclePartySelector.vue";
 import {useForm} from "vee-validate";
-import {defaultLabel, defaultTextInput, disabledTextInput, whiteButton} from "@/styles";
+import {defaultLabel, defaultTextInput, disabledTextInput, whiteButton, defaultButton} from "@/styles";
 import {ref} from "vue";
 import getUser from "@/apis/employee/getUser";
 import userDetailSchema from "@/validators/employee/userDetailSchema";
@@ -69,7 +69,8 @@ export default {
         defaultTextInput,
         disabledTextInput,
         onlyDigitParser,
-        whiteButton
+        whiteButton,
+        defaultButton
       }
     } catch (e) {
       await errorStore.set('error', '사용자 조회 실패', e)
@@ -150,6 +151,18 @@ export default {
               </div>
             </div>
           </div>
+        </div>
+
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+          <router-link :to="{name: 'user_list'}" type="button"
+                       class="text-sm font-semibold leading-6 text-gray-900">
+            취소
+          </router-link>
+                    <button type="submit"
+                            :class="defaultButton">
+                      저장
+                    </button>
         </div>
       </form>
 
