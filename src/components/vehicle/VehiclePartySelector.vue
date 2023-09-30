@@ -211,7 +211,7 @@ import {defaultTextInput} from "@/styles";
 import {defineComponent} from "vue";
 import getAllAffiliateList from "@/apis/affiliate/listAll";
 import getUserList from "@/apis/user/list";
-import getSetParty from "@/apis/vehicle/party";
+import getSetParty from "@/apis/affiliate/party";
 import vehiclePartyParser from "@/utils/vehicle/vehiclePartyParser";
 
 export default defineComponent({

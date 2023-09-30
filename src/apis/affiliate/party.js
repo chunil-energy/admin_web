@@ -11,7 +11,7 @@ const getSetParty = async (params) => {
     try {
         const authStore = useAuthStore()
         await authStore.tokenRefresh()
-        const userUrl = `${import.meta.env.VITE_API_URL}/api/admin/v1/vehicle/party/`;
+        const userUrl = `${import.meta.env.VITE_API_URL}/api/admin/v1/affiliate/party/`;
         const option = {
             method: 'get', url: userUrl, params: params, headers: {Authorization: `Bearer ${authStore.accessToken}`},
             validateStatus: (status) => {

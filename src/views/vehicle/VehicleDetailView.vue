@@ -190,65 +190,6 @@ const onSubmit = vehicleUpdateHandleSubmit(async values => {
         </div>
       </form>
     </div>
-    <hr class="border border-gray-300">
-    <div class="-mx-4 mt-10 mb-10 sm:mx-0 sm:rounded-lg">
-      <div>
-        <div><h2 class="text-base font-semibold leading-7 text-gray-900">기사정보</h2></div>
-      </div>
-      <div class="my-3">
-        <div class="text-sm font-semibold text-gray-900">기사 배정</div>
-        <DriverAssignComponent :vehicle-data="vehicleData"/>
-      </div>
-      <div class="flow-root">
-        <div class="-mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead>
-              <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">기사</th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">휴대전화</th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">배정일</th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">해제일</th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">현행</th>
-              </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-              <tr v-for="vehicleDriver in vehicleData.data.vehicle_driver_set" :key="vehicleDriver.id">
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0"
-                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">{{
-                    vehicleDriver.driver_user_name ? `${vehicleDriver.driver_user_name}(${vehicleDriver.driver_user_username})` : vehicleDriver.driver_user_username
-                  }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm"
-                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
-                  {{
-                    vehicleDriver.driver_user_cellphone ? phoneNumberParser(vehicleDriver.driver_user_cellphone) : '-'
-                  }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm"
-                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
-                  {{ dateRangeParser(vehicleDriver.assign_date_range)[0] }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm"
-                    :class="vehicleDriver.current ? ['text-gray-900', 'font-medium'] : ['text-gray-500']">
-                  {{ dateRangeParser(vehicleDriver.assign_date_range)[1] }}
-                </td>
-                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-sm font-medium sm:pr-0">
-                  <CheckCircleIcon class="h-5 w-5 text-green-400" v-if="vehicleDriver.current"/>
-                  <XCircleIcon class="h-5 w-5 text-red-400" v-if="!vehicleDriver.current"/>
-                </td>
-                <!--                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">-->
-                <!--                  <a href="#" class="text-indigo-600 hover:text-indigo-900"-->
-                <!--                  >Edit<span class="sr-only">, {{ vehicleDriver.name }}</span></a-->
-                <!--                  >-->
-                <!--                </td>-->
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
