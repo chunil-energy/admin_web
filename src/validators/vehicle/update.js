@@ -12,7 +12,7 @@ const vehicleUpdateSchema = toTypedSchema(
         owner_party: zod.number({required_error: "차량 소유자는 필수 항목입니다.",}),
         user_party: zod.number({required_error: "차량 사용자는 필수 항목입니다.",}),
         manager_party: zod.number({required_error: "차량 관리자는 필수 항목입니다.",}),
-        // driver: zod.number().nullable()
+        driver: zod.number().optional().nullable()
         // parent: zod.string().transform((value) => value === null ? '' : value.id).optional()
     })
 );

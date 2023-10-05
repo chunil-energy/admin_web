@@ -258,7 +258,6 @@ export default defineComponent({
       searchType.value = 'address'
       open.value = false
     }
-    // const emits = defineEmits(['selectLocation'])
     const onSubmit = handleSubmit(async (fv) => {
       context.emit('selectLocation', fv)
       close()
@@ -295,6 +294,11 @@ export default defineComponent({
     ChevronLeftIcon, ChevronRightIcon
   },
   props: {
+    initialData: {
+      type: Object,
+      required: false,
+      default: null
+    },
     openProp: {
       type: Boolean,
       required: false,
@@ -327,6 +331,9 @@ export default defineComponent({
     let mapScript = document.createElement('script')
     mapScript.setAttribute('src', `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=temkao00ek`)
     document.head.appendChild(mapScript)
+    if (this.initialData) {
+      this.$emit('selectLocation', this.initialData)
+    }
   },
   watch: {
     async open(newValue, oldValue) {

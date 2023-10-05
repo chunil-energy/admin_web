@@ -25,9 +25,15 @@ import BankAccountComponent from "@/components/common/BankAccountComponent.vue"
 import createEmployee from "@/apis/employee/createEmployee";
 import {ref} from "vue";
 import getUser from "@/apis/employee/getUser";
+import {jobTypeChoice} from "@/utils/common/jobType";
 
 export default {
   name: 'EmployeeCreateView',
+  computed: {
+    jobTypeChoice() {
+      return jobTypeChoice
+    }
+  },
   async setup() {
     const errorStore = useErrorStore()
     const route = useRoute()
@@ -69,6 +75,7 @@ export default {
     const employmentTypeBinding = defineInputBinds('employment_type')
     const payTypeBinding = defineInputBinds('pay_type')
     const salaryAccountBinding = defineInputBinds('salary_account')
+    const jobTypeBinding = defineInputBinds('job_type')
     const workStartBinding = defineInputBinds('work_start')
     const workEndBinding = defineInputBinds('work_end')
 
@@ -111,6 +118,7 @@ export default {
       employmentTypeBinding,
       payTypeBinding,
       salaryAccountBinding,
+      jobTypeBinding,
       workStartBinding,
       workEndBinding,
       onSubmit,
@@ -171,6 +179,23 @@ export default {
                   {{ formErrors.grade }}
                 </p>
               </div>
+              <div class="col-span-2">
+                <label for="grade" :class="defaultLabel">직무</label>
+                <div class="mt-2">
+                  <select id="job_type" name="job_type" :class="defaultSelect"
+                          v-bind="jobTypeBinding">
+                    <option v-for="[jobValue, jobTypeName] in Object.entries(jobTypeChoice)"
+                            :value="jobValue" v-bind:key="jobTypeName">
+                      {{ jobTypeName }}
+                    </option>
+                  </select>
+                </div>
+                <p class="mt-2 text-sm text-red-600" id="grade-error" v-if="formErrors.job_type">
+                  {{ formErrors.job_type }}
+                </p>
+              </div>
+            </div>
+            <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
               <div class="col-span-2">
                 <label for="contract_company" :class="defaultLabel">고용 관계사</label>
                 <div class="mt-2">

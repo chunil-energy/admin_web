@@ -14,6 +14,7 @@ import vehicleUpdateSchema from "@/validators/vehicle/update";
 import phoneNumberParser from "@/utils/common/phoneNumberParser";
 import dateRangeParser from "@/utils/common/dateRangeParser";
 import DriverAssignComponent from "@/components/vehicle/DriverAssignComponent.vue";
+import EmployeeSelector from "@/components/common/EmployeeSelector.vue";
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -39,6 +40,7 @@ const vehicle_type = vehicleUpdateDefineInputBind('vehicle_type')
 const owner_party = vehicleUpdateDefineInputBind('owner_party')
 const user_party = vehicleUpdateDefineInputBind('user_party')
 const manager_party = vehicleUpdateDefineInputBind('manager_party')
+const driver = vehicleUpdateDefineInputBind('driver')
 
 const onSubmit = vehicleUpdateHandleSubmit(async values => {
   const response = await updateVehicle(vehicleId, values)
@@ -133,6 +135,15 @@ const onSubmit = vehicleUpdateHandleSubmit(async values => {
                 {{ vehicleUpdateErrors.position }}
               </p>
             </div>
+              <div class="sm:col-span-3">
+                <label for="position" class="block text-sm font-medium leading-6 text-gray-900">기사</label>
+                <div class="mt-2">
+                  <EmployeeSelector :initial-employee="driver.value" :placeholder-string="'기사'" :label-string="'기사'" @selectEmployee="value => vehicleUpdateSetFieldValue('driver', value)"/>
+                </div>
+                <p class="mt-2 text-sm text-red-600" id="vehicle_type-error" v-if="vehicleUpdateErrors.driver">
+                  {{ vehicleUpdateErrors.driver }}
+                </p>
+              </div>
           </div>
           <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
             <div class="sm:col-span-3">

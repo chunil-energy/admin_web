@@ -15,6 +15,7 @@ import onlyDigitParser from "@/utils/common/onlyDigitParser";
 import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
 import isAlphaNumericKey from "@/utils/common/isAlphaNumericKey";
 import onlyAlphaNumericParser from "@/utils/common/onlyAlphaNumericParser";
+import EmployeeSelector from "@/components/common/EmployeeSelector.vue";
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -33,6 +34,7 @@ const vin = vehicleCreateDefineInputBind('vin')
 const name = vehicleCreateDefineInputBind('name')
 const position = vehicleCreateDefineInputBind('position')
 const vehicle_type = vehicleCreateDefineInputBind('vehicle_type')
+const driver = vehicleCreateDefineInputBind('driver')
 const owner_party = vehicleCreateDefineInputBind('owner_party')
 const user_party = vehicleCreateDefineInputBind('user_party')
 const manager_party = vehicleCreateDefineInputBind('manager_party')
@@ -125,6 +127,15 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
                 </div>
                 <p class="mt-2 text-sm text-red-600" id="vehicle_type-error" v-if="vehicleCreateErrors.position">
                   {{ vehicleCreateErrors.position }}
+                </p>
+              </div>
+              <div class="sm:col-span-3">
+                <label for="position" class="block text-sm font-medium leading-6 text-gray-900">기사</label>
+                <div class="mt-2">
+                  <EmployeeSelector :placeholder-string="'기사'" :label-string="'기사'" @selectEmployee="value => vehicleCreateSetFieldValue('driver', value)"/>
+                </div>
+                <p class="mt-2 text-sm text-red-600" id="vehicle_type-error" v-if="vehicleCreateErrors.driver">
+                  {{ vehicleCreateErrors.driver }}
                 </p>
               </div>
             </div>
