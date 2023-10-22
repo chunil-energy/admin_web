@@ -68,7 +68,7 @@ const showRegistration = async (registration) => {
     <h2 class="text-base font-semibold leading-7 text-gray-900">등록증</h2>
   </div>
   <div class="border-b border-gray-200 mb-5">
-    {{ registrationCreateValues }}
+<!--    {{ registrationCreateValues }}-->
     <form @submit.prevent="onSubmit" method="post">
       <div class="border-b border-gray-900/10 pb-12">
         <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
