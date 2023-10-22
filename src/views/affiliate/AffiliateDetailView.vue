@@ -93,19 +93,6 @@ const onSubmit = handleSubmit(async values => {
 
             <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div class="sm:col-span-3">
-                <label for="rep" class="block text-sm font-medium leading-6 text-gray-900">대표자명</label>
-                <div class="mt-2">
-                  <input type="text" name="rep" id="rep" v-bind="rep"
-                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
-                </div>
-                <p class="mt-2 text-sm text-red-600" id="rep-error" v-if="formErrors.rep">
-                  {{ formErrors.rep }}
-                </p>
-              </div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div class="sm:col-span-3">
                 <label for="brn" class="block text-sm font-medium leading-6 text-gray-900">사업자등록번호</label>
                 <div class="mt-2">
                   <input type="text" name="brn" id="brn" v-bind="brn" maxlength="10"
@@ -119,6 +106,25 @@ const onSubmit = handleSubmit(async values => {
                 </p>
               </div>
               <div class="sm:col-span-3">
+                <label for="rep" class="block text-sm font-medium leading-6 text-gray-900">대표자명</label>
+                <div class="mt-2">
+                  <input type="text" name="rep" id="rep" v-bind="rep"
+                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+                <p class="mt-2 text-sm text-red-600" id="rep-error" v-if="formErrors.rep">
+                  {{ formErrors.rep }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div class="sm:col-span-3">
+                <AffiliateSelectComponent @setAffiliateId="(affData) => {setFieldValue('parent', affData)}"
+                                          :initial-value="parent.value" :label-string="'주사업장'"
+                                          :request-query="{parent: 'N', selfId: affiliateData.id}"/>
+                <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">
+              </div>
+              <div class="sm:col-span-3" v-if="!parent?.value">
                 <label for="registration_no"
                        class="block text-sm font-medium leading-6 text-gray-900">법인등록번호</label>
                 <div class="mt-2">
@@ -132,19 +138,6 @@ const onSubmit = handleSubmit(async values => {
                   {{ formErrors.registration_no }}
                 </p>
               </div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div class="sm:col-span-3">
-                <AffiliateSelectComponent @setAffiliateId="(affData) => {setFieldValue('parent', affData)}"
-                                          :initial-value="parent.value" :label-string="'주사업장'"
-                                          :request-query="{parent: 'N', selfId: affiliateData.id}"/>
-                <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">
-              </div>
-              <!--                  <div class="mb-5">-->
-              <!--                    <FileUploadComponent/>-->
-              <!--                    <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">-->
-              <!--                  </div>-->
             </div>
 
           </div>

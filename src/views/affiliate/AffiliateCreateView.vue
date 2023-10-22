@@ -57,32 +57,20 @@ const onSubmit = handleSubmit(async values => {
                   <input type="text" name="name_legal" id="name_legal" v-bind="name_legal"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
-                <p class="mt-2 text-sm text-gray-900">사업자등록증에 기재된 사업자명</p>
+                <p class="mt-2 text-sm text-gray-900">법인등기부등본에 기재된 법인명명</p>
                 <p class="mt-2 text-sm text-red-600" id="name_legal-error" v-if="formErrors.name_legal">
                   {{formErrors.name_legal}}
                 </p>
               </div>
               <div class="sm:col-span-3">
-                <label for="name" class="block text-sm font-medium leading-6 text-gray-900">사업장명</label>
+                <label for="name" class="block text-sm font-medium leading-6 text-gray-900">사업자명</label>
                 <div class="mt-2">
                   <input type="text" name="name" id="name" v-bind="name"
                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                 </div>
-                <p class="mt-2 text-sm text-gray-900">일반적으로 사용하는 사업장명</p>
+                <p class="mt-2 text-sm text-gray-900">사업자등록증상 기재된 사업장명</p>
                 <p class="mt-2 text-sm text-red-600" id="name-error" v-if="formErrors.name">
                   {{formErrors.name}}
-                </p>
-              </div>
-            </div>
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div class="sm:col-span-3">
-                <label for="rep" class="block text-sm font-medium leading-6 text-gray-900">대표자명</label>
-                <div class="mt-2">
-                  <input type="text" name="rep" id="rep" v-bind="rep"
-                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
-                </div>
-                <p class="mt-2 text-sm text-red-600" id="rep-error" v-if="formErrors.rep">
-                  {{formErrors.rep}}
                 </p>
               </div>
             </div>
@@ -101,6 +89,22 @@ const onSubmit = handleSubmit(async values => {
                 </p>
               </div>
               <div class="sm:col-span-3">
+                <label for="rep" class="block text-sm font-medium leading-6 text-gray-900">대표자명</label>
+                <div class="mt-2">
+                  <input type="text" name="rep" id="rep" v-bind="rep"
+                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+                <p class="mt-2 text-sm text-red-600" id="rep-error" v-if="formErrors.rep">
+                  {{formErrors.rep}}
+                </p>
+              </div>
+            </div>
+            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div class="sm:col-span-3">
+                <AffiliateSelectComponent @setAffiliateId="(affData) => {setFieldValue('parent', affData)}" :label-string="'주사업장'" :request-query="{parent: 'N'}"/>
+                <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">
+              </div>
+              <div class="sm:col-span-3" v-if="!parent.value">
                 <label for="registration_no" class="block text-sm font-medium leading-6 text-gray-900">법인등록번호</label>
                 <div class="mt-2">
                   <input type="text" name="registration_no" id="registration_no" v-bind="registration_no" maxlength="13"
@@ -112,12 +116,6 @@ const onSubmit = handleSubmit(async values => {
                 <p class="mt-2 text-sm text-red-600" id="registration_no-error" v-if="formErrors.registration_no">
                   {{formErrors.registration_no }}
                 </p>
-              </div>
-            </div>
-            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div class="sm:col-span-3">
-                <AffiliateSelectComponent @setAffiliateId="(affData) => {setFieldValue('parent', affData)}" :label-string="'주사업장'" :request-query="{parent: 'N'}"/>
-                <input hidden="hidden" type="number" name="parent" v-bind="parent" ref="parentInput">
               </div>
             </div>
           </div>

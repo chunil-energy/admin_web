@@ -6,7 +6,6 @@ import {useErrorStore} from "@/stores/error";
 import AffiliateSelectComponent from "@/components/affiliate/AffiliateSelectComponent.vue";
 import createAffiliate from "@/apis/affiliate/create";
 import onlyDigitParser from "@/utils/common/onlyDigitParser";
-import onlyKorNumberParser from "@/utils/common/onlyKorNumberParser";
 import affiliateCreateSchema from "@/validators/affiliate/create";
 
 
