@@ -73,10 +73,10 @@ export default {
           <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">
             사업자등록번호
           </th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">주사업장</th>
           <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">
             법인등록번호
           </th>
-          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">주사업장</th>
           <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
             <span class="sr-only">Select</span>
           </th>
@@ -113,11 +113,11 @@ export default {
           <td :class="[affiliateIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-900 lg:table-cell']">
             {{ brnParser(affiliate.brn) }}
           </td>
-          <td :class="[affiliateIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-900 lg:table-cell']">
-            {{ corpRegisterNoParser(affiliate.registration_no) }}
-          </td>
           <td :class="[affiliateIdx === 0 ? '' : 'border-t border-gray-200', 'relative py-4 pl-4 pr-3 text-sm sm:pl-6']">
             {{ affiliate?.parent_name }}
+          </td>
+          <td :class="[affiliateIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-900 lg:table-cell']">
+            {{ corpRegisterNoParser(affiliate.registration_no) }}
           </td>
           <!--          <td :class="[vehicleIdx === 0 ? '' : 'border-t border-gray-200', 'px-3 py-3.5 text-sm text-gray-500']">-->
           <!--            <div class="sm:hidden">{{ vehicle.price }}/mo</div>-->

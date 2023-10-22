@@ -1,10 +1,10 @@
 <template>
   <div class="grid grid-cols-12 items-center gap-2">
-    <div :class="selectedAffiliate ? 'col-span-10' : 'col-span-12'">
+    <div :class="selectedEmployeeData ? 'col-span-10' : 'col-span-12'">
       <input type="text" id="owner_party_display" name="vehicle_party_display" @click="open = !open" readonly :placeholder="placeholderString"
-             :class="[...defaultTextInput, 'clickable']" :value="selectedAffiliate ? selectedAffiliate.name : ''">
+             :class="[...defaultTextInput, 'clickable']" :value="selectedEmployeeData ? employeeParser(selectedEmployeeData) : ''">
     </div>
-    <div :class="selectedAffiliate ? 'col-span-2' : 'hidden'">
+    <div :class="selectedEmployeeData ? 'col-span-2' : 'hidden'">
       <XMarkIcon class="w-5 h-5" @click="clearUser"></XMarkIcon>
     </div>
   </div>
@@ -43,8 +43,8 @@
                     <div class="px-4 py-5">
                       <form class="sm:flex sm:items-center" @submit.prevent="searchPage">
                         <div class="w-full sm:max-w-xs">
-                          <input type="text" id="affiliateQuery" name="affiliateQuery" :class="[...defaultTextInput]" ref="affiliateInput"
-                                 @input="(event) => affiliateQuery = event.target.value">
+                          <input type="text" id="userQuery" name="userQuery" :class="[...defaultTextInput]" ref="employeeInput"
+                                 @input="(event) => userQuery = event.target.value">
                         </div>
                           <button type="submit"
                                   class="mt-3 inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:ml-3 sm:mt-0 sm:w-auto">
@@ -53,7 +53,7 @@
                       </form>
                     </div>
 
-                    <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto" v-if="affiliateData?.results ? affiliateData.results.length === 0 : true">
+                    <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto" v-if="employeeListData?.results ? employeeListData.results.length === 0 : true">
                       <li>
                         <div class="group relative flex items-center px-5 py-6 border-t">
                           <div class="-m-1 block flex-1 p-1">
@@ -68,27 +68,31 @@
                       </li>
                     </ul>
                     <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto clickable" v-else>
-                      <li v-for="(affiliate, affiliateIdx) in affiliateData?.results || []" :key="affiliate.id" @click="selectAffiliate(affiliate)">
+                      <li v-for="(employee, employeeIdx) in employeeListData?.results || []" :key="employee.id" @click="selectEmployee(employee)">
                         <div class="group relative flex items-center px-5 py-6"
-                             :class="affiliateIdx === 0 ? 'border-t' : ''" >
+                             :class="employeeIdx === 0 ? 'border-t' : ''" >
                           <div class="-m-1 block flex-1 p-1">
                             <div class="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true"/>
-                            <div class="relative min-w-0 grid grid-cols-4 items-center text-left">
+                            <div class="relative min-w-0 grid grid-cols-5 items-center text-left">
                               <div class="ml-4 col-span-1">
-                                <p class="truncate text-sm text-gray-500">사업장명</p>
-                                <p class="truncate font-medium text-gray-900">{{ affiliate.name }}</p>
+                                <p class="truncate text-sm text-gray-500">성명</p>
+                                <p class="truncate font-medium text-gray-900">{{ employee.name || '-' }}</p>
                               </div>
                               <div class="ml-4 col-span-1">
-                                <p class="truncate text-sm text-gray-500">법인명</p>
-                                <p class="truncate font-medium text-gray-900">{{ affiliate.name_legal }}</p>
+                                <p class="truncate text-sm text-gray-500">직급</p>
+                                <p class="truncate font-medium text-gray-900">{{ employee.grade || '-' }}</p>
                               </div>
                               <div class="ml-4 col-span-1">
-                                <p class="truncate text-sm text-gray-500">사업자등록번호</p>
-                                <p class="truncate font-medium text-gray-900">{{ affiliate.brn ? brnParser(affiliate.brn) : null }}</p>
+                                <p class="truncate text-sm text-gray-500">직무</p>
+                                <p class="truncate font-medium text-gray-900">{{ jobTypeParser(employee.job_type) || '-' }}</p>
                               </div>
                               <div class="ml-4 col-span-1">
-                                <p class="truncate text-sm text-gray-500">대표자</p>
-                                <p class="truncate font-medium text-gray-900">{{ affiliate.rep }}</p>
+                                <p class="truncate text-sm text-gray-500">휴대전화</p>
+                                <p class="truncate font-medium text-gray-900">{{ employee.cellphone ? phoneNumberParser(employee.cellphone) : '-' }}</p>
+                              </div>
+                              <div class="ml-4 col-span-1">
+                                <p class="truncate text-sm text-gray-500">이메일</p>
+                                <p class="truncate font-medium text-gray-900">{{ employee.email || '-' }}</p>
                               </div>
                             </div>
                           </div>
@@ -97,17 +101,17 @@
                     </ul>
                     <div
                         class="flex items-center justify-between rounded-b-lg border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-                      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between" v-if="affiliateData">
+                      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between" v-if="employeeListData">
                         <div>
                           <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                            <a href="#" v-if="affiliateData.previous_page !== null"
-                               @click.prevent="navigatePage(affiliateData.previous_page)"
+                            <a href="#" v-if="employeeListData.previous_page !== null"
+                               @click.prevent="navigatePage(employeeListData.previous_page)"
                                class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
                               <span class="sr-only">이전</span>
                               <ChevronLeftIcon class="h-5 w-5" aria-hidden="true"/>
                             </a>
-                            <template v-for="pageIndex in affiliateData.page_list">
-                              <template v-if="pageIndex === affiliateData.current_page">
+                            <template v-for="pageIndex in employeeListData.page_list">
+                              <template v-if="pageIndex === employeeListData.current_page">
                                 <a href="#" aria-current="page" @click.prevent="navigatePage(pageIndex)"
                                    class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{
                                     pageIndex
@@ -120,8 +124,8 @@
                                   }}</a>
                               </template>
                             </template>
-                            <a href="#" v-if="affiliateData.next_page !== null"
-                               @click.prevent="navigatePage(affiliateData.next_page)"
+                            <a href="#" v-if="employeeListData.next_page !== null"
+                               @click.prevent="navigatePage(employeeListData.next_page)"
                                class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
                               <span class="sr-only">다음</span>
                               <ChevronRightIcon class="h-5 w-5" aria-hidden="true"/>
@@ -159,11 +163,13 @@ import {XMarkIcon, ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/24/ou
 import {EllipsisVerticalIcon} from '@heroicons/vue/20/solid'
 import {defaultTextInput} from "@/styles";
 import {defineComponent} from "vue";
-import getAffiliateList from "@/apis/affiliate/list";
-import brnParser from "../../utils/common/brnParser";
+import getEmployeeListData from "@/apis/employee/listEmploye";
+import phoneNumberParser from "../../utils/common/phoneNumberParser";
+import {jobTypeParser} from "@/utils/common/jobType";
+import employeeParser from "@/utils/common/employeeParser";
 
 export default defineComponent({
-  name: 'AffiliateSelector',
+  name: 'EmployeeSelector',
   setup() {
     const errorState = useErrorStore()
     return {errorState, defaultTextInput}
@@ -193,64 +199,65 @@ export default defineComponent({
     labelString: {
       type: String,
       required: false,
-      default: '관계사'
+      default: '임직원'
     },
-    initialAffiliate: {
+    initialEmployee: {
       type: Object,
       required: false,
       default: null
     },
   },
-  emits: ['selectAffiliate'],
+  emits: ['selectEmployee'],
   data() {
     return {
       open: false,
-      affiliateData: null,
-      affiliateQuery: '',
-      selectedAffiliate: null
+      employeeListData: null,
+      userQuery: '',
+      selectedEmployeeData: null
     }
   },
   async mounted() {
     this.open = this.openProp
-    if (this.initialAffiliate) {
-      console.log('initialAffiliate ', this.initialAffiliate)
-      this.selectedAffiliate = this.initialAffiliate
-      this.$emit('selectAffiliate', this.selectedAffiliate.id)
+    if (this.initialEmployee) {
+      this.selectedEmployeeData = this.initialEmployee
+      this.$emit('selectEmployee', this.selectedEmployeeData.id)
     }
   },
   watch: {
     async open(newValue, oldValue) {
       if (newValue === oldValue) return
-      if (newValue) {
-        this.affiliateData = await getAffiliateList()
-        setTimeout(() => {this.$refs.affiliateInput.focus()}, 0)
+      if (newValue === true) {
+        this.employeeListData = await getEmployeeListData()
+        setTimeout(() => {this.$refs.employeeInput.focus()}, 0)
       }
     }
   },
   methods: {
-    brnParser,
+    jobTypeParser,
+    phoneNumberParser,
+    employeeParser,
     async navigatePage(pageNo) {
       let params = {'page': pageNo}
-      if (this.affiliateQuery !== '') {
-        params['query'] = this.affiliateQuery
+      if (this.userQuery !== '') {
+        params['query'] = this.userQuery
       }
-      this.affiliateData = await getAffiliateList(params)
+      this.employeeListData = await getEmployeeListData(params)
     },
     async searchPage() {
       let params = {'page': 1}
-      if (this.affiliateQuery !== '') {
-        params['query'] = this.affiliateQuery
+      if (this.userQuery !== '') {
+        params['query'] = this.userQuery
       }
-      this.affiliateData = await getAffiliateList(params)
+      this.employeeListData = await getEmployeeListData(params)
     },
-    async selectAffiliate(affiliateData) {
-      this.selectedAffiliate = affiliateData
-      this.$emit('selectAffiliate', this.selectedAffiliate.id)
+    async selectEmployee(selectedEmployeeData) {
+      this.selectedEmployeeData = selectedEmployeeData
+      this.$emit('selectEmployee', this.selectedEmployeeData.id)
       this.open = false
     },
     clearUser() {
-      this.selectedAffiliate = null
-      this.$emit('selectAffiliate', null)
+      this.selectedEmployeeData = null
+      this.$emit('selectEmployee', null)
     }
   }
 })

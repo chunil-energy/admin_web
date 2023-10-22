@@ -4,6 +4,7 @@ import {employmentTypeChoice, payTypeChoice} from "@/choices/employee";
 import {bankAccountObject} from "@/validators/common/bankAccount";
 import {locationObject, locationSchema} from "@/validators/common/location";
 import dayjs from "dayjs";
+import {jobTypeChoice} from "@/utils/common/jobType";
 
 const employeeDetailSchema = toTypedSchema(
     zod.object({
@@ -18,13 +19,14 @@ const employeeDetailSchema = toTypedSchema(
         email: zod.string({
             required_error: '이메일은 필수 항목입니다.'
         }).email('올바른 이메일 형식이 아닙니다.').nullable().optional(),
-        home: locationObject.nullable().optional(),
+        home: locationObject,
         // home_address: zod.string({required_error: '자택 주소는 필수 항목입니다.'}),
         // home_address_detail: zod.string({required_error: '자택 주소 상세는 필수 항목입니다.'}),
         // home_address_data: zod.any(),
         employment_type: zod.enum(Object.keys(employmentTypeChoice)),
         pay_type: zod.enum(Object.keys(payTypeChoice)),
         salary_account: bankAccountObject.optional().nullable(),
+        job_type: zod.enum(Object.keys(jobTypeChoice)),
         work_start: zod.coerce.date().transform(v => dayjs(v).format('YYYY-MM-DD')),
         // work_start: zod.string({required_error: "입사일을 선택하세요."}).nonempty('배정일을 선택하세요.').pipe(zod.coerce.date({
         //     invalid_type_error: '날짜 형식이 올바르지 않습니다.'

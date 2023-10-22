@@ -9,6 +9,7 @@ import vehicleTypeParser from "@/utils/vehicle/vehicleTypeParser";
 import vehiclePositionParser from "@/utils/vehicle/vehiclePositionParser";
 import vehiclePartyParser from "@/utils/vehicle/vehiclePartyParser";
 import getVehicleList from "@/apis/vehicle/list";
+import employeeParser from "@/utils/common/employeeParser";
 export default {
   name: 'AffiliateListView',
   async setup() {
@@ -24,6 +25,7 @@ export default {
     'chevron-right-icon': ChevronRightIcon,
   },
   methods: {
+    employeeParser,
     vehiclePartyParser,
     vehiclePositionParser,
     vehicleTypeParser,
@@ -82,7 +84,7 @@ export default {
             용도
           </th>
           <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
-            기사연락처</th>
+            기사</th>
           <th scope="col" class="relative py-3.5 px-3 pr-4 sm:pr-3">
             <span class="sr-only">Select</span>
           </th>
@@ -110,6 +112,9 @@ export default {
           </td>
           <td :class="[vehicleIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-500 lg:table-cell']">
             {{ vehiclePositionParser(vehicle.position) }}
+          </td>
+          <td :class="[vehicleIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-500 lg:table-cell']">
+            {{ vehicle.driver ? employeeParser(vehicle.driver) : '' }}
           </td>
           <td :class="[vehicleIdx === 0 ? '' : 'border-t border-gray-200', 'hidden px-3 py-3.5 text-sm text-gray-500 lg:table-cell']">
             <router-link type="button" :to="{name: 'vehicle_detail', params: {vehicleId: vehicle.id}}"

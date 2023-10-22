@@ -4,6 +4,7 @@ import phoneNumberParser from "@/utils/common/phoneNumberParser";
 import ListViewComponent from "@/components/common/ListViewComponent.vue";
 import {defaultTextInput, defaultButton, whiteButton} from "@/styles";
 import getEmployeeListData from "@/apis/employee/listEmploye";
+import {jobTypeParser} from "@/utils/common/jobType";
 
 const sample = {
   "id": 1,
@@ -46,6 +47,7 @@ export default {
     const columns = [
       {type: 'data', name: '성명', field: 'name', class: null},
       {type: 'data', name: '직급', field: 'grade', class: null},
+      {type: 'data', name: '직무', field: 'job_type', class: null},
       {type: 'data', name: '휴대전화', field: 'cellphone', class: null},
       {type: 'data', name: '전화', field: 'tel', class: null},
       {type: 'data', name: '이메일', field: 'email', class: null},
@@ -70,10 +72,9 @@ export default {
       item['tel'] = item['tel'] ? phoneNumberParser(item['tel']) : null
       item['contract_company'] = item['contract_company'] ? item['contract_company'].name : null
       item['work_company'] = item['work_company'] ? item['work_company'].name : null
+      item['job_type'] = jobTypeParser(item['job_type'])
       //   item['isEmployee'] = !!item['employee']
     })
-    console.log('itemData')
-    console.log(itemData)
     return {query, columns, itemData, defaultTextInput, defaultButton, whiteButton}
   },
   components: {
