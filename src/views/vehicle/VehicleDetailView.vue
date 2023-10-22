@@ -1,11 +1,12 @@
 <script setup>
-import {BanknotesIcon, BuildingOfficeIcon, WrenchIcon} from "@heroicons/vue/20/solid";
+import {BanknotesIcon, BuildingOfficeIcon, WrenchIcon, ClipboardIcon} from "@heroicons/vue/20/solid";
 import {useRoute, useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/error";
 import getVehicle from "@/apis/vehicle/get";
 import {ref, computed} from "vue";
 import VehicleDetailBaseComponent from "@/views/vehicle/vehicleDetail/VehicleDetailBaseComponent.vue";
 import VehicleDetailInsuranceComponent from "@/views/vehicle/vehicleDetail/VehicleDetailInsuranceComponent.vue";
+import VehicleDetailRegistrationComponent from "@/views/vehicle/vehicleDetail/VehicleDetailRegistrationComponent.vue";
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -38,10 +39,17 @@ const tabs = ref([
     current: 'insurance' === currentTab
   },
   {
-    name: '점검정보',
+    name: '등록증',
+    value: 'registration',
+    to: {name: 'vehicle_detail', params: {vehicleId: vehicleId}, query: {tab: 'registration'}},
+    icon: ClipboardIcon,
+    current: 'registration' === currentTab
+  },
+  {
+    name: '정기점검',
     value: 'check',
     to: {name: 'vehicle_detail', params: {vehicleId: vehicleId}, query: {tab: 'check'}},
-    icon: WrenchIcon,
+    icon: BanknotesIcon,
     current: 'check' === currentTab
   },
 ])
@@ -79,8 +87,11 @@ const tabs = ref([
     <div class="mt-5 mb-10  sm:mx-0 sm:rounded-lg" v-if="currentTab === 'insurance'">
       <VehicleDetailInsuranceComponent/>
     </div>
+    <div class="mt-5 mb-10  sm:mx-0 sm:rounded-lg" v-if="currentTab === 'registration'">
+      <VehicleDetailRegistrationComponent/>
+    </div>
     <div class="mt-5 mb-10  sm:mx-0 sm:rounded-lg" v-if="currentTab === 'check'">
-      Construction
+<!--      <VehicleDetailRegistrationComponent/>-->
     </div>
   </div>
 </template>
