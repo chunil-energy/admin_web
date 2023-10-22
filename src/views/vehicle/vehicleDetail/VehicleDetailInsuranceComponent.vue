@@ -1,9 +1,8 @@
 <script setup>
-import {defaultLabel, defaultSelect, defaultTextInput} from "@/styles"
+import {defaultTextInput} from "@/styles"
 import {useForm} from "vee-validate";
 import {useRoute, useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/error";
-import getVehicle from "@/apis/vehicle/get";
 import {getVehicleInsurance, registerVehicleInsurance, vehicleInsuranceCertificate} from "@/apis/vehicle/insurance";
 import CommonSelectComponent from "@/components/common/CommonSelectComponent.vue";
 import FileUploadComponent from "@/components/common/FileUploadComponent.vue";
@@ -11,10 +10,15 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
+import ko from 'dayjs/locale/ko'
 import vehicleInsuranceCreateSchema from "@/validators/vehicle/insurance";
-import PdfViewer from "@/components/common/PdfViewer.vue";
 import {useViewerStore} from "@/stores/viewer";
-import getRegistration from "@/apis/collection/company/getRegistration";
+import {ref, onMounted, computed} from "vue";
+import {getVehicleRegistration} from "@/apis/vehicle/registration";
+
+
+dayjs.extend(utc)
+dayjs.locale('ko')
 
 const router = useRouter()
 const errorStore = useErrorStore()
@@ -22,14 +26,21 @@ const route = useRoute()
 const vehicleId = parseInt(route.params.vehicleId)
 
 const viewerStore = useViewerStore()
-const vehicleData = await getVehicle(vehicleId)
-const insuranceData = await getVehicleInsurance(vehicleId)
-const insurerOptions = insuranceData.data.insurer.map((insurer) => {
-  return {id: insurer[0], name: insurer[1]}
+const insuranceData = ref(null)
+
+onMounted(async () => {
+  insuranceData.value = await getVehicleInsurance(vehicleId)
 })
 
-dayjs.extend(utc)
-dayjs.locale('ko')
+const insurerOptions = computed(() => {
+  if (!insuranceData.value) {
+    return []
+  }
+  return insuranceData.value.data.insurer.map((insurer) => {
+    return {id: insurer[0], name: insurer[1]}
+  })
+})
+
 const {
   values: insuranceCreateValues,
   errors: insuranceCreateErrors,
@@ -50,7 +61,7 @@ const today = dayjs()
 const onSubmit = insuranceCreateHandleSubmit(async values => {
   const response = await registerVehicleInsurance(vehicleId, values)
   if (response.success) {
-    await router.go(0)
+    insuranceData.value = await getVehicleInsurance(vehicleId)
   }
 });
 
@@ -58,6 +69,7 @@ const showCertificate = async (insurance) => {
   const certificationData = await vehicleInsuranceCertificate(vehicleId, insurance.id)
   await viewerStore.showViewer(certificationData.data.url)
 }
+
 </script>
 
 <template>
@@ -65,8 +77,8 @@ const showCertificate = async (insurance) => {
     <h2 class="text-base font-semibold leading-7 text-gray-900">보험정보</h2>
   </div>
   <div class="border-b border-gray-200 mb-5">
-<!--    {{ insuranceCreateValues }}-->
-    <form @submit.prevent="onSubmit" method="post">
+    <!--    {{ insuranceCreateValues }}-->
+    <form @submit.prevent="onSubmit" method="post" v-if="insuranceData">
       <div class="border-b border-gray-900/10 pb-12">
         <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-9">
           <div class="sm:col-span-1">
@@ -120,7 +132,7 @@ const showCertificate = async (insurance) => {
             <!--                </p>-->
           </div>
           <div class="sm:col-span-1">
-            <div class="flex items-center justify-end gap-x-6 h-full">
+            <div class="flex items-end justify-end gap-x-6 h-full">
               <button type="submit"
                       class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                 저장
