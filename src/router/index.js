@@ -25,6 +25,7 @@ import UserListView from "@/views/employee/UserListView.vue";
 import UserCreateView from "@/views/employee/UserCreateView.vue";
 import UserDetailView from "@/views/employee/UserDetailView.vue";
 import EmployeeDetailView from "@/views/employee/EmployeeDetailView.vue";
+import GpsView from "@/views/gps/GpsView.vue";
 
 
 const router = createRouter({
@@ -126,6 +127,18 @@ const router = createRouter({
           name: 'vehicle_detail',
           component: VehicleDetailView,
           meta: {name: '차량상세', requireAuth: true}
+        },
+        {
+          path: '/gps',
+          name: 'gps_index',
+          component: GpsView,
+          meta: {name: '지도', requireAuth: true, fullscreen: true}
+        },
+        {
+          path: '/gps/tracker',
+          name: 'gps_tracker_list',
+          component: VehicleDetailView,
+          meta: {name: '단말기 관리', requireAuth: true}
         },
         {
           path: '/collection/company',

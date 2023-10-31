@@ -133,7 +133,7 @@
     <!-- Static sidebar for desktop -->
     <div
         :class="['hidden', 'lg:fixed', 'lg:inset-y-0', 'lg:z-50', 'lg:flex', 'lg:flex-col', desktopSidebarShow ? 'lg:w-60':'lg:w-16']"
-        @mouseenter="() => desktopSidebarHover = true" @mouseleave="() => desktopSidebarHover = false">
+        @mouseenter="() => {desktopSidebarHover = true;}" @mouseleave="() => {desktopSidebarHover = false;}">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <div class="flex h-16 shrink-0 items-center">
@@ -284,9 +284,8 @@
       </router-link>
     </div>
 
-    <main class="py-10" :class="['py-10', desktopSidebarShow ? 'lg:pl-60' : 'lg:pl-16']">
-      <div class="px-4 sm:px-6 lg:px-8">
-        <!-- Your content -->
+    <main :class="[!fullscreen ? 'py-10' : '', desktopSidebarShow ? 'lg:pl-60' : 'lg:pl-16']">
+      <div id="layoutContent" :class="fullscreen ? [] : ['px-4', 'sm:px-6', 'lg:px-8']">
         <Suspense>
           <router-view/>
         </Suspense>
@@ -297,7 +296,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, onMounted, ref, watch, nextTick} from 'vue'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
 import {ChevronRightIcon, LockOpenIcon, LockClosedIcon,} from '@heroicons/vue/20/solid'
@@ -313,7 +312,7 @@ import {
   HomeModernIcon,
   UserGroupIcon,
   ArrowRightOnRectangleIcon,
-  UsersIcon
+  MapIcon
 } from '@heroicons/vue/24/outline'
 import {RouterLink, useRoute} from "vue-router";
 import {useAuthStore} from "@/stores/auth";
@@ -355,6 +354,16 @@ const navigation = [
     ],
   },
   {
+    name: 'GPS',
+    icon: MapIcon,
+    children: [
+      {name: '지도', router_name: 'gps_index'},
+      {name: '단말기 목록', router_name: 'gps_tracker_list'},
+      // { name: 'Human Resources', href: '#' },
+      // { name: 'Customer Success', href: '#' },
+    ],
+  },
+  {
     name: '소형 수집운반',
     iconType: 'svg-icon',
     icon: mdiTruckFastOutline,
@@ -386,11 +395,6 @@ const teams = [
   // { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
 ]
 
-// onMounted(() => {
-//   route.matched.forEach((m) => {
-//     console.log(m)})
-// })
-
 
 const authStore = useAuthStore()
 const layoutStore = useLayoutStore()
@@ -399,7 +403,18 @@ const logout = () => {
   authStore.logout()
 }
 const sidebarOpen = ref(false)
+const fullscreen = ref(false)
 
+watch(route, (newRoute, oldRoute) => {
+  fullscreen.value = newRoute.meta.fullscreen === true
+  layoutStore.setContentWidth()
+})
+
+
+onMounted(() => {
+  fullscreen.value = route.meta.fullscreen === true
+  layoutStore.setContentWidth()
+})
 const desktopSidebarLockStorage = localStorage.getItem('desktopSidebarLock')
 const desktopSidebarLock = ref(desktopSidebarLockStorage ? JSON.parse(desktopSidebarLockStorage) : true)
 const desktopSidebarHover = ref(false)
@@ -412,9 +427,33 @@ const desktopSidebarShow = computed(() => {
   }
   return show
 })
+
+watch(desktopSidebarLock, () => {
+  nextTick(() => {
+    layoutStore.setContentWidth()
+  })
+})
+watch(desktopSidebarHover, () => {
+  nextTick(() => {
+    layoutStore.setContentWidth()
+  })
+})
+watch(desktopSidebarLock, () => {
+  nextTick(() => {
+    layoutStore.setContentWidth()
+  })
+})
+watch(desktopSidebarShow, () => {
+  nextTick(() => {
+    layoutStore.setContentWidth()
+  })
+})
 const toggleDesktopSidebarLock = () => {
   const currentState = desktopSidebarLock.value
   desktopSidebarLock.value = !currentState
   localStorage.setItem('desktopSidebarLock', JSON.parse(desktopSidebarLock.value))
+  nextTick(() => {
+    layoutStore.setContentWidth()
+  })
 }
 </script>
