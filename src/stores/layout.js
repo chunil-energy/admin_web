@@ -6,7 +6,8 @@ export const useLayoutStore = defineStore({
     state: () => ({
         showOverlay: localStorage.getItem('showOverlay') ? JSON.parse(localStorage.getItem('showOverlay')):false,
         pdfFileUrl: null,
-        imageFileUrl: null
+        imageFileUrl: null,
+        contentWidth: 0
     }),
     actions: {
         overlayOn() {
@@ -32,6 +33,9 @@ export const useLayoutStore = defineStore({
             this.imageFileUrl = null
             const viewerStore = useViewerStore()
             viewerStore.clearStore()
+        },
+        setContentWidth() {
+            this.contentWidth = document.getElementById('layoutContent').offsetWidth
         }
     }
 });
