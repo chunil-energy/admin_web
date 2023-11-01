@@ -2,7 +2,7 @@
 import {useRoute} from "vue-router";
 import {useErrorStore} from "@/stores/error";
 import TrackerListComponents from "@/views/gps/components/TrackerListComponents.vue";
-import {getGPSSession, setTrackerAPI} from "@/apis/gps";
+import {getGPSSession, getTrackerDetailAPI, setTrackerAPI} from "@/apis/gps";
 import {useLayoutStore} from "@/stores/layout";
 import ContextMenu from "@/views/gps/components/ContextMenu.vue";
 
@@ -214,7 +214,12 @@ export default {
       this.contextMenuShow =  false
       this.contextMenuTracker = null
       this.contextMenuPosition = [0, 0]
-    }
+    },
+
+    async getTrackerDetail(tracker) {
+      const response = await getTrackerDetailAPI(tracker.id)
+      console.log(response)
+    },
   }
 }
 
@@ -252,7 +257,9 @@ export default {
     <ContextMenu :show="contextMenuShow" :position="contextMenuPosition" :tracker-data="contextMenuTracker"
                  @closeMenu="closeContextMenu"
                  @removeTracker="tracker => removeTracker(tracker)"
+                 @showRecentTrip="tracker => getTrackerDetail(tracker)"
                  @setCenter="tracker => setCenter(tracker)"/>
+    <TripComponent/>
   </div>
   <!--  <div>-->
   <!--    -->

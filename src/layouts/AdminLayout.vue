@@ -414,6 +414,9 @@ watch(route, (newRoute, oldRoute) => {
 onMounted(() => {
   fullscreen.value = route.meta.fullscreen === true
   layoutStore.setContentWidth()
+  window.addEventListener('resize', () => {
+    layoutStore.setContentWidth()
+  })
 })
 const desktopSidebarLockStorage = localStorage.getItem('desktopSidebarLock')
 const desktopSidebarLock = ref(desktopSidebarLockStorage ? JSON.parse(desktopSidebarLockStorage) : true)
