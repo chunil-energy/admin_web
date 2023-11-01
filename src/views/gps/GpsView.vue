@@ -4,6 +4,7 @@ import {useErrorStore} from "@/stores/error";
 import TrackerListComponents from "@/views/gps/components/TrackerListComponents.vue";
 import {getGPSSession, setTrackerAPI} from "@/apis/gps";
 import {useLayoutStore} from "@/stores/layout";
+import ContextMenu from "@/views/gps/components/ContextMenu.vue";
 
 export default {
   name: 'GpsView',
@@ -37,7 +38,10 @@ export default {
       mapBoundary: null,
       sample: [],
       // 단말기 목록 및 데이터
-      trackerList: []
+      trackerList: [],
+      contextMenuShow: false,
+      contextMenuTracker: null,
+      contextMenuPosition: [0, 0]
     }
   },
   mounted() {
@@ -45,7 +49,7 @@ export default {
     // 최초 로딩시에는 설정된 트래커가 없으므로 redundant 하다
     // this.trackerList = this.gpsSession.tracker_set
   },
-  components: {TrackerListComponents},
+  components: {ContextMenu, TrackerListComponents},
   computed: {},
   methods: {
     setTrackerAPI,
@@ -74,15 +78,17 @@ export default {
         naver.maps.Event.addListener(this.map, 'center_changed', function (e) {
           _this.mapCenterPoint = e
           _this.mapBoundary = _this.map.getBounds()
+          _this.closeContextMenu()
         });
         naver.maps.Event.addListener(this.map, 'zoom_changed', function (e) {
           _this.zoomLevel = e
           _this.mapBoundary = _this.map.getBounds()
+          _this.closeContextMenu()
         });
-        _this.map.addListener('click', (event) => {
-          this.sample.push({latitude: event.coord.y, longitude: event.coord.x})
-          console.log(`{"name": "장소명", "latitude": ${event.coord.y}, "longitude": ${event.coord.x}},`)
-        })
+        // _this.map.addListener('click', (event) => {
+        //   this.sample.push({latitude: event.coord.y, longitude: event.coord.x})
+        //   console.log(`{"name": "장소명", "latitude": ${event.coord.y}, "longitude": ${event.coord.x}},`)
+        // })
       }
       document.body.append(script)
     },
@@ -91,7 +97,7 @@ export default {
       htmlArray = [
         `<div class="marker min-w-24 h-8 rounded-full bg-white ring-2 ring-inset ring-blue-600/90 pl-2 pr-4 flex justify-start items-center">`,
         // `<div class="flex justify-center items-center rounded-full text-white text-xs h-6 w-6 bg-blue-600 mr-1">단말기</div>`,
-        `<div class="marker text-sm font-black truncate">${tracker.identifier}</div>`,
+        `<div class="text-sm font-semibold truncate"><span class="font-bold">${tracker.target.type_display + ' '}</span>${tracker.target.name}</div>`,
         '</div>',
         `<div class="-translate-y-0.5 ml-4 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-blue-600 border-r-[6px] border-r-transparent"></div>`
       ]
@@ -111,7 +117,7 @@ export default {
       return new naver.maps.Marker({
         position: new naver.maps.LatLng(position.latitude, position.longitude),
         map: this.map,
-        title: tracker.identifier,
+        title: tracker.target.name,
         icon: this.generateMarkerIcon(tracker),
         meta: tracker
       })
@@ -141,24 +147,25 @@ export default {
       // last_position이 있는 경우 마커와 폴리라인 생성
       if (tracker.last_position) {
         let marker = this.createMarker(tracker)
-        let listener = naver.maps.Event.addListener(marker, 'click', () => {
-          this.showContextMenu(tracker)
+        let listener = naver.maps.Event.addListener(marker, 'click', (event) => {
+          this.showContextMenu(event, tracker)
         })
         this.trackerList[trackerIndex]['marker'] = marker
       }
     },
     removeTracker(tracker) {
+      console.log(tracker)
       let trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === tracker.id)
       if (trackerIndex <= -1) {
         return null
       }
-      // 마커 삭제
-      let marker = this.trackerList[trackerIndex]['marker']
       // let polyline = this.trackerList[trackerIndex]['polyline']
-      let listener = naver.maps.Event.addListener(marker, 'click', () => {
-        naver.maps.Event.removeListener(listener)
-      })
+      let marker = this.trackerList[trackerIndex]['marker']
+      // 마커 삭제
       if (marker) {
+        let listener = naver.maps.Event.addListener(marker, 'click', () => {
+          naver.maps.Event.removeListener(listener)
+        })
         marker.setMap(null)
       }
       this.trackerList.splice(trackerIndex, 1)
@@ -193,11 +200,24 @@ export default {
       const position = tracker.last_position
       this.map.setCenter(new naver.maps.LatLng(position.latitude, position.longitude))
     },
-    showContextMenu(tracker) {
-      console.log(tracker)
+    showContextMenu(event, tracker) {
+      let pointerEvent = event
+      if (event?.originalEvent) {
+        pointerEvent = event.originalEvent
+      }
+      const position = [pointerEvent.clientX, pointerEvent.clientY]
+      this.contextMenuShow =  true
+      this.contextMenuTracker = tracker
+      this.contextMenuPosition = position
+    },
+    closeContextMenu() {
+      this.contextMenuShow =  false
+      this.contextMenuTracker = null
+      this.contextMenuPosition = [0, 0]
     }
   }
 }
+
 </script>
 
 <template>
@@ -211,8 +231,8 @@ export default {
             <template v-for="tracker in trackerList" v-bind:key="tracker.id">
               <div
                   class="w-full h-8 rounded-full bg-white ring-2 ring-inset ring-blue-600/90 pl-2 pr-4 flex justify-start items-center clickable"
-                  @click="showContextMenu(tracker)">
-                <div class="text-sm font-black truncate">{{ tracker.identifier }}</div>
+                  @click="event => showContextMenu(event, tracker)">
+                <div class="text-sm font-semibold truncate"><span class="font-bold">{{tracker.target.type_display + ' '}} </span>{{ tracker.target.name }}</div>
               </div>
             </template>
           </div>
@@ -229,6 +249,10 @@ export default {
     <TrackerListComponents :show="showTrackerList"
                            :gps-session="gpsSession" @setTrackers="(value) => setTracker(value)"
                            @update:show="value => showTrackerList = value"/>
+    <ContextMenu :show="contextMenuShow" :position="contextMenuPosition" :tracker-data="contextMenuTracker"
+                 @closeMenu="closeContextMenu"
+                 @removeTracker="tracker => removeTracker(tracker)"
+                 @setCenter="tracker => setCenter(tracker)"/>
   </div>
   <!--  <div>-->
   <!--    -->

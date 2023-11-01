@@ -197,7 +197,7 @@ export default {
                               고유값
                             </th>
                             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
-                              차량
+                              설치
                             </th>
 <!--                            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">-->
 <!--                              현재위치-->
@@ -217,7 +217,8 @@ export default {
                                 {{ tracker.identifier }}
                               </td>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden px-3.5 py-3.5 text-sm text-gray-500 lg:table-cell']">
-                                {{ tracker.vehicle ? tracker.vehicle.car_no : '미등록' }}
+                                <span class="font-bold">{{tracker.target.type_display + ' '}} </span>
+                                <span>{{tracker.target.name}}</span>
                               </td>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden pl-3 pr-5 py-3.5 text-sm text-gray-500 lg:table-cell']">
                                 <!--                                {{ tracker.selected }}-->
