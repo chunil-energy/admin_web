@@ -24,7 +24,7 @@ export default {
       default: null
     }
   },
-  emits: ['setCenter', 'closeMenu', 'removeTracker'],
+  emits: ['setCenter', 'closeMenu', 'removeTracker', 'showTripDialog'],
   methods: {
     setCenter() {
       this.$emit('setCenter', this.trackerData)
@@ -35,6 +35,10 @@ export default {
     },
     removeTracker() {
       this.$emit('removeTracker', this.trackerData)
+      this.closeMenu()
+    },
+    showTripDialog() {
+      this.$emit('showTripDialog', this.trackerData)
       this.closeMenu()
     }
   },
@@ -70,7 +74,8 @@ export default {
       <template v-else>
         <button class="text-gray-700 block px-4 py-2 text-sm text-left w-full">위치정보 없음</button>
       </template>
-        <button class="text-gray-700 block px-4 py-2 text-sm text-left w-full" @click="removeTracker">제거</button>
+      <button class="text-gray-700 block px-4 py-2 text-sm text-left w-full" @click="showTripDialog">경로보기</button>
+      <button class="text-gray-700 block px-4 py-2 text-sm text-left w-full" @click="removeTracker">제거</button>
     </div>
   </div>
 

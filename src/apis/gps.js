@@ -99,4 +99,33 @@ const setTrackerAPI = async (sessionId, trackerList) => {
     }
 }
 
-export {getGPSSession, getTrackerList, setTrackerAPI}
+const getTrackerTripAPI = async (trackerId, startDateString, endDateString) => {
+    const errorStore = useErrorStore()
+    const layoutStore = useLayoutStore()
+    layoutStore.overlayOn()
+    try {
+        const authStore = useAuthStore()
+        await authStore.tokenRefresh()
+        const url = `${import.meta.env.VITE_API_URL}/api/admin/v1/gps/tracker/${trackerId}/trip/`;
+        const params = {start_date: startDateString, end_date: endDateString}
+        const option = {
+            method: 'get', url: url, params: params, headers: {Authorization: `Bearer ${authStore.accessToken}`},
+            validateStatus: (status) => {
+                return [200, 403].indexOf(status) > -1
+            }
+        }
+        const response = await axios.request(option)
+        if (response.status === 403) {
+            await errorStore.set('error', '권한 오류', '경로 조회 권한이 없습니다.')
+            return []
+        }
+        return response.data
+    } catch (e) {
+        await errorStore.set('error', '조회 실패', `경로 조회중 오류가 발생했습니다. ${e}`)
+        return []
+    } finally {
+        layoutStore.overlayOff()
+    }
+}
+
+export {getGPSSession, getTrackerList, setTrackerAPI, getTrackerTripAPI}
