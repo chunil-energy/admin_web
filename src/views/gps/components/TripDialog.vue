@@ -76,7 +76,7 @@ export default {
 
 <template>
 
-  <div class="col-span-2 px-4 py-2 h-screen overflow-auto" v-if="show">
+  <div class="col-span-1 px-4 py-2 h-screen overflow-auto" v-if="show">
     <div class="flex gap-1 mb-3">
       <div
           class="rounded-full bg-indigo-600 px-2.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
@@ -97,6 +97,8 @@ export default {
         <VueDatePicker :input-class-name="defaultTextInput.join(' ')" :enable-time-picker="false"
                        :locale="'ko-Kr'" :range="true"
                        :model-value="dateRange"
+                       :clearable="false"
+                       :teleport="true"
                        @update:model-value="(value) => dateRange=value"
                        :auto-apply="true" format="yyyy-MM-dd"/>
       </div>
@@ -117,13 +119,13 @@ export default {
           </div>
           <div class="flow-root">
             <ul role="list" class="-mb-8">
-              <li v-for="(position, positionIndex) in dateData[1].slice().reverse()"
+              <li v-for="(position, positionIndex) in dateData[1].slice().reverse().filter(pos => pos.is_start === true || pos.is_end === true)"
                   @mouseout="removePartialPolyline"
                   @mouseover="drawPartialPolyline(position)">
-                <div class="relative pb-8" v-if="position.is_start === true || position.is_end === true">
+                <div class="relative pb-8">
                   <template v-if="positionIndex !== dateData[1].length - 1">
                     <!-- 마지막 포지션이 아니라면 지금 포지션과 다음 포지션의 trip_seq 이 같을 경우 수직선을 그린다.-->
-                    <template v-if="position.trip_seq === dateData[1].slice().reverse()[positionIndex+1].trip_seq">
+                    <template v-if="position.trip_seq === dateData[1].slice().reverse().filter(pos => pos.is_start === true || pos.is_end === true)[positionIndex+1].trip_seq">
                       <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
                     </template>
                   </template>

@@ -386,7 +386,7 @@ export default {
       <!--          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
       <!--        </div>-->
       <!--      </div>-->
-      <div :class="[tripDialogShow ? 'col-span-9' : 'col-span-11']">
+      <div :class="[tripDialogShow ? 'col-span-10' : 'col-span-11']">
         <div id="mapDiv" class="w-full h-screen"></div>
       </div>
     </div>
