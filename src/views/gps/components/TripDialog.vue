@@ -117,7 +117,7 @@ export default {
           </div>
           <div class="flow-root">
             <ul role="list" class="-mb-8">
-              <li v-for="(position, positionIndex) in dateData[1]"
+              <li v-for="(position, positionIndex) in dateData[1].slice().reverse()"
                   @mouseout="removePartialPolyline"
                   @mouseover="drawPartialPolyline(position)">
                 <div class="relative pb-8" v-if="position.is_start === true || position.is_end === true">
