@@ -201,7 +201,9 @@ export default {
         strokeColor: color || '#5347AA',
         strokeStyle: style || 'solid',
         strokeOpacity: opacity || 0.2,
-        strokeWeight: weight || 5
+        strokeWeight: weight || 5,
+        strokeLineCap: 'round',
+        strokeLineJoin: 'round'
       });
     },
     drawTotalPolyline(positions) {
