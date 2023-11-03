@@ -121,15 +121,22 @@ export default {
                   @mouseout="removePartialPolyline"
                   @mouseover="drawPartialPolyline(position)">
                 <div class="relative pb-8" v-if="position.is_start === true || position.is_end === true">
-                  <!--                {{ position }}-->
-                  <!--                {{ positionIndex }}-->
-                  <template v-if="positionIndex !== 0">
-                  <span v-if="position.trip_seq !== dateData[1][positionIndex-1].trip_seq"
-                        class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
+                  <template v-if="positionIndex !== dateData[1].length - 1">
+                    <!-- 마지막 포지션이 아니라면 지금 포지션과 다음 포지션의 trip_seq 이 같을 경우 수직선을 그린다.-->
+                    <template v-if="position.trip_seq === dateData[1][positionIndex+1].trip_seq">
+                      <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
+                    </template>
                   </template>
-                  <template v-else>
-                    <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
-                  </template>
+<!--                  <template v-if="positionIndex !== 0">-->
+<!--                  <span v-if="position.trip_seq !== dateData[1][positionIndex-1].trip_seq"-->
+<!--                        class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>-->
+<!--                  </template>-->
+<!--                  <template v-else>-->
+<!--                    <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>-->
+<!--                  </template>-->
+
+
+
                   <div class="relative flex space-x-3 clickable" @click="setCenter(position)">
                     <template v-if="position.is_start && position.is_end">
                       <div>
