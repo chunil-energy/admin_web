@@ -50,6 +50,7 @@ export default {
       tripTracker: null,
       tripTotalPolyline: null,
       tripPartialPolyline: null,
+      tripMarkers: []
     }
   },
   mounted() {
@@ -121,6 +122,32 @@ export default {
       ]
       return htmlArray.join('')
     },
+    generateTripMarkerIconHtml(position, title) {
+      let htmlArray = []
+      if (position.is_start && position.is_end) {
+        htmlArray = [
+          `<div class="marker min-w-24 h-8 rounded-full bg-yellow-500 ring-2 ring-inset ring-yellow-600/90 px-2 flex justify-start items-center text-center">`,
+          `<div class="text-sm font-semibold truncate text-slate-50"><span class="font-bold">${title}</div>`,
+          '</div>',
+          `<div class="-translate-y-0.5 ml-4 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-yellow-600 border-r-[6px] border-r-transparent"></div>`
+        ]
+      } else if (position.is_start) {
+        htmlArray = [
+          `<div class="marker min-w-24 h-8 rounded-full bg-blue-500 ring-2 ring-inset ring-blue-600/90 px-2 flex justify-start items-center text-center">`,
+          `<div class="text-sm font-semibold truncate text-slate-50"><span class="font-bold">${title}</div>`,
+          '</div>',
+          `<div class="-translate-y-0.5 ml-4 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-blue-600 border-r-[6px] border-r-transparent"></div>`
+        ]
+      } else if (position.is_end) {
+        htmlArray = [
+          `<div class="marker min-w-24 h-8 rounded-full bg-red-500 ring-2 ring-inset ring-red-600/90 px-2 flex justify-start items-center text-center">`,
+          `<div class="text-sm font-semibold truncate text-slate-50"><span class="font-bold">${title}</div>`,
+          '</div>',
+          `<div class="-translate-y-0.5 ml-4 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-red-600 border-r-[6px] border-r-transparent"></div>`
+        ]
+      }
+      return htmlArray.join('')
+    },
     generateMarkerIcon(tracker) {
       return {
         content: this.generateMarkerIconHtml(tracker),
@@ -139,6 +166,32 @@ export default {
         icon: this.generateMarkerIcon(tracker),
         meta: tracker
       })
+    },
+    createTripMarker(position) {
+      // const position = tracker.last_position
+      let title
+      let htmlArray
+      if (position.is_start && position.is_end) {
+        title = '단순시동'
+      } else if (position.is_start) {
+        title = '출발'
+      } else if (position.is_end) {
+        title = '도착'
+      } else {
+        return null
+      }
+      let marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(position.latitude, position.longitude),
+        map: this.map,
+        title: title,
+        icon: {
+          content: this.generateTripMarkerIconHtml(position, title),
+          anchor: new naver.maps.Point(22, 40),
+        },
+        meta: position
+      })
+      console.log(marker)
+      return marker
     },
     createPolyline(positions, color, style, opacity, weight) {
       return new naver.maps.Polyline({
@@ -170,12 +223,16 @@ export default {
       this.tripPartialPolyline = this.createPolyline(
           positions, '#d41179', 'solid', 1, 5
       )
+      positions.filter(pos => pos.is_start || pos.is_end).map(pos => {
+        this.tripMarkers.push(this.createTripMarker(pos))
+      })
     },
     removePartialPolyline() {
       if (this.tripPartialPolyline) {
         this.tripPartialPolyline.setMap(null)
         this.tripPartialPolyline = null
       }
+      this.tripMarkers.forEach(marker => marker.setMap(null))
     },
     addTracker(tracker) {
       let trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === tracker.id)
@@ -239,6 +296,9 @@ export default {
         return null
       }
       const position = tracker.last_position
+      this.map.setCenter(new naver.maps.LatLng(position.latitude, position.longitude))
+    },
+    setPositionCenter(position) {
       this.map.setCenter(new naver.maps.LatLng(position.latitude, position.longitude))
     },
     showContextMenu(event, tracker) {
@@ -316,13 +376,14 @@ export default {
                   @drawTotalPolyline="positions => drawTotalPolyline(positions)"
                   @drawPartialPolyline="drawPartialPolyline"
                   @removePartialPolyline="removePartialPolyline"
+                  @setCenter="setPositionCenter"
                   :tracker-data="tripTracker" @closeDialog="() => {tripDialogShow = false}"/>
-<!--      <div class="col-span-2 px-4 py-2 h-screen overflow-auto" v-if="tripDialogShow">-->
-<!--        <div>-->
-<!--          <h3 class="text-base font-semibold leading-7 text-gray-900">Applicant Information</h3>-->
-<!--          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="col-span-2 px-4 py-2 h-screen overflow-auto" v-if="tripDialogShow">-->
+      <!--        <div>-->
+      <!--          <h3 class="text-base font-semibold leading-7 text-gray-900">Applicant Information</h3>-->
+      <!--          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div :class="[tripDialogShow ? 'col-span-9' : 'col-span-11']">
         <div id="mapDiv" class="w-full h-screen"></div>
       </div>
@@ -355,7 +416,7 @@ export default {
                            @update:show="value => showTrackerList = value"/>
     <ContextMenu :show="contextMenuShow" :position="contextMenuPosition" :tracker-data="contextMenuTracker"
                  @closeMenu="closeContextMenu"
-                 @showTripDialog="(tracker) => {tripTracker = tracker; tripDialogShow = true;}"
+                 @showTripDialog="(tracker) => {tripTracker = tracker; tripDialogShow = true; setCenter(tracker)}"
                  @removeTracker="tracker => removeTracker(tracker)"
                  @setCenter="tracker => setCenter(tracker)"/>
     <!--    <TripDialog :show="tripDialogShow" :tracker-data="tripTracker" @closeDialog="() => {tripDialogShow = false}"/>-->
@@ -364,3 +425,49 @@ export default {
   <!--    -->
   <!--  </div>-->
 </template>
+
+<style scoped>
+.mapMarker {
+    /* Set the marker size here */
+    width: 2rem;
+    height: 2rem;
+    border-radius: 2rem;
+    /* Set the marker color here */
+    background: #aa3300;
+
+    display: inline-block;
+    border-bottom-right-radius: 0;
+    position: relative;
+    transform: rotate(45deg);
+
+    /* optional fanciness */
+    border: 1px solid #881100;
+}
+/* inner circle (optional if you don't need the central dot) */
+.mapMarker::before {
+    content: "";
+    background: white;
+    width: 50%;
+    height: 50%;
+    border-radius: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    /* optional fanciness */
+    box-shadow: 0.1rem 0.1rem 0.2rem 0.1rem rgba(0, 0, 0, 0.1);
+}
+/* shadow (optional if you don't need a shadow) */
+.mapMarker::after {
+    content: "";
+    background: rgba(128, 128, 128, 0.2);
+    width: 75%;
+    height: 75%;
+    border-radius: 100%;
+    position: absolute;
+    top: 100%;
+    left: 100%;
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(0.5);
+}
+</style>
