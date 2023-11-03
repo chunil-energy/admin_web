@@ -325,28 +325,6 @@ export default {
 
 <template>
   <div style="width: 100%; height: 100vh">
-    <!--    <div class="absolute top-5" :style="{width: `${layoutStore.contentWidth}px`}">-->
-    <!--      <div class="flex items-center justify-center w-full px-3">-->
-    <!--        <div class="flex bg-white w-11/12 rounded-2xl min-h-max px-4 py-3 shadow-xl">-->
-    <!--          <div id="trackerList" class="flex-grow grid grid-cols-12 pr-4 gap-2">-->
-    <!--            <template v-for="tracker in trackerList" v-bind:key="tracker.id">-->
-    <!--              <div-->
-    <!--                  class="w-full h-8 rounded-full bg-white ring-2 ring-inset ring-blue-600/90 pl-2 pr-4 flex justify-start items-center clickable"-->
-    <!--                  @click="event => showContextMenu(event, tracker)">-->
-    <!--                <div class="text-sm font-semibold truncate"><span class="font-bold">{{tracker.target.type_display + ' '}} </span>{{ tracker.target.name }}</div>-->
-    <!--              </div>-->
-    <!--            </template>-->
-    <!--          </div>-->
-    <!--          <div>-->
-    <!--            <button-->
-    <!--                class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"-->
-    <!--                @click="showTrackerList = !showTrackerList">-->
-    <!--              단말기 목록-->
-    <!--            </button>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </div>-->
     <div class="grid grid-cols-12 h-screen divide-x">
       <!--      <div class="col-span-1">-->
       <!--        sdf-->
@@ -355,7 +333,10 @@ export default {
         <div class="mb-2">
           <button
               class="w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
-              @click="showTrackerList = !showTrackerList">
+              @click="() => {
+                showTrackerList = true;
+                tripDialogShow = false
+              }">
             단말기 목록
           </button>
         </div>
@@ -379,40 +360,12 @@ export default {
                   @drawPartialPolyline="drawPartialPolyline"
                   @removePartialPolyline="removePartialPolyline"
                   @setCenter="setPositionCenter"
+                  @removeTotalPolyline="removeTotalPolyline"
                   :tracker-data="tripTracker" @closeDialog="() => {tripDialogShow = false}"/>
-      <!--      <div class="col-span-2 px-4 py-2 h-screen overflow-auto" v-if="tripDialogShow">-->
-      <!--        <div>-->
-      <!--          <h3 class="text-base font-semibold leading-7 text-gray-900">Applicant Information</h3>-->
-      <!--          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <div :class="[tripDialogShow ? 'col-span-9' : 'col-span-11']">
+      <div :class="[tripDialogShow ? 'col-span-10' : 'col-span-11']">
         <div id="mapDiv" class="w-full h-screen"></div>
       </div>
     </div>
-
-    <!--    <div class="absolute top-0 right-0" :style="{width: `200px`}">-->
-    <!--      <div class="flex items-center justify-center w-full">-->
-    <!--        <div class="bg-white p-3 w-full h-screen shadow-xl">-->
-    <!--          <div id="trackerList" class="flex-grow grid grid-cols-12 pr-4 gap-2">-->
-    <!--            <template v-for="tracker in trackerList" v-bind:key="tracker.id">-->
-    <!--              <div-->
-    <!--                  class="w-full h-8 rounded-full bg-white ring-2 ring-inset ring-blue-600/90 pl-2 pr-4 flex justify-start items-center clickable"-->
-    <!--                  @click="event => showContextMenu(event, tracker)">-->
-    <!--                <div class="text-sm font-semibold truncate"><span class="font-bold">{{tracker.target.type_display + ' '}} </span>{{ tracker.target.name }}</div>-->
-    <!--              </div>-->
-    <!--            </template>-->
-    <!--          </div>-->
-    <!--          <div class="w-full">-->
-    <!--            <button-->
-    <!--                class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"-->
-    <!--                @click="showTrackerList = !showTrackerList">-->
-    <!--              단말기 목록-->
-    <!--            </button>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </div>-->
     <TrackerListComponents :show="showTrackerList"
                            :gps-session="gpsSession" @setTrackers="(value) => setTracker(value)"
                            @update:show="value => showTrackerList = value"/>
