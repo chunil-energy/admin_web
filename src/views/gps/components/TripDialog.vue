@@ -123,7 +123,7 @@ export default {
                 <div class="relative pb-8" v-if="position.is_start === true || position.is_end === true">
                   <template v-if="positionIndex !== dateData[1].length - 1">
                     <!-- 마지막 포지션이 아니라면 지금 포지션과 다음 포지션의 trip_seq 이 같을 경우 수직선을 그린다.-->
-                    <template v-if="position.trip_seq === dateData[1][positionIndex+1].trip_seq">
+                    <template v-if="position.trip_seq === dateData[1].slice().reverse()[positionIndex+1].trip_seq">
                       <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
                     </template>
                   </template>
@@ -147,7 +147,7 @@ export default {
                       </div>
                       <div class="flex min-w-0 flex-1 justify-between space-x-4">
                         <div>
-                          <p class="text-sm text-gray-500">1분 미만 운행(단순시동)</p>
+                          <p class="text-sm text-gray-500">1분 미만 운행(단순시동){{position.trip_seq}}</p>
                         </div>
                         <div class="whitespace-nowrap text-right text-sm text-gray-500">
                           <time :datetime="position.time">{{ position.time }}</time>
@@ -163,10 +163,10 @@ export default {
                       </div>
                       <div class="flex min-w-0 flex-1 justify-between space-x-4">
                         <div v-if="dateData[1].findIndex(pos => pos.trip_seq === position.trip_seq && pos.is_end) > -1">
-                          <p class="text-sm text-gray-500">운행 시작</p>
+                          <p class="text-sm text-gray-500">운행 시작{{position.trip_seq}}</p>
                         </div>
                         <div v-else>
-                          <p class="text-sm text-gray-500">주행중</p>
+                          <p class="text-sm text-gray-500">주행중{{position.trip_seq}}</p>
                         </div>
                         <div class="whitespace-nowrap text-right text-sm text-gray-500">
                           <time :datetime="position.time">{{ position.time }}</time>
@@ -181,7 +181,7 @@ export default {
                       </div>
                       <div class="flex min-w-0 flex-1 justify-between space-x-4">
                         <div>
-                          <p class="text-sm text-gray-500">운행 종료</p>
+                          <p class="text-sm text-gray-500">운행 종료{{position.trip_seq}}</p>
                         </div>
                         <div class="whitespace-nowrap text-right text-sm text-gray-500">
                           <time :datetime="position.time">{{ position.time }}</time>
