@@ -155,7 +155,7 @@ const onSubmit = vehicleCreateHandleSubmit(async values => {
                 </p>
               </div>
               <div class="sm:col-span-3">
-                <label for="user_party" class="block text-sm font-medium leading-6 text-gray-900">소유자</label>
+                <label for="user_party" class="block text-sm font-medium leading-6 text-gray-900">사용자</label>
                 <div class="mt-2">
 
                   <VehiclePartySelector :label-string="'차량 사용자'"
