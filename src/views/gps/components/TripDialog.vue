@@ -42,7 +42,10 @@ export default {
       dateRange: [new Date(), new Date()]
     }
   },
-  emits: ['closeDialog', 'drawTotalPolyline', 'removePartialPolyline', 'drawPartialPolyline', 'setCenter', 'removeTotalPolyline'],
+  emits: [
+    'closeDialog', 'drawTotalPolyline', 'removePartialPolyline', 'drawPartialPolyline', 'setCenter',
+    'removeTotalPolyline'
+  ],
   watch: {
     trackerData(nv, ov) {
       if (nv?.id !== ov?.id) {
@@ -87,18 +90,26 @@ export default {
 
 <template>
 
-  <div class="col-span-1 px-4 py-2 h-screen overflow-auto" v-if="show">
-    <div class="flex gap-1 mb-3">
-      <div
-          class="rounded-full bg-indigo-600 px-2.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        {{ trackerData.target.type_display }}
+  <div class="col-span-2 px-4 py-2 h-screen overflow-auto" v-if="show">
+    <div class="flex gap-1 mb-3 justify-between items-center">
+      <div class="flex gap-1">
+        <div
+            class="rounded-full bg-indigo-600 px-2.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          {{ trackerData.target.type_display }}
+        </div>
+        <div>
+          <h3 class="text-base font-semibold leading-7 text-gray-900">
+            {{ trackerData.target.name }}
+          </h3>
+        </div>
       </div>
-      <div>
-        <h3 class="text-base font-semibold leading-7 text-gray-900">
-          {{ trackerData.target.name }}
-        </h3>
+      <div class="ml-4 flex flex-shrink-0">
+          <button type="button" @click="closeDialog"
+                  class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <span class="sr-only">Close</span>
+            <XMarkIcon class="h-5 w-5" aria-hidden="true"/>
+          </button>
       </div>
-      <!--          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>-->
     </div>
     <div class="mb-5">
       <!--      {{ dateRange }}-->
@@ -136,20 +147,11 @@ export default {
                 <div class="relative pb-8">
                   <template v-if="positionIndex !== dateData[1].length - 1">
                     <!-- 마지막 포지션이 아니라면 지금 포지션과 다음 포지션의 trip_seq 이 같을 경우 수직선을 그린다.-->
-                    <template v-if="position.trip_seq === dateData[1].slice().reverse().filter(pos => pos.is_start === true || pos.is_end === true)[positionIndex+1]?.trip_seq">
+                    <template
+                        v-if="position.trip_seq === dateData[1].slice().reverse().filter(pos => pos.is_start === true || pos.is_end === true)[positionIndex+1]?.trip_seq">
                       <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>
                     </template>
                   </template>
-<!--                  <template v-if="positionIndex !== 0">-->
-<!--                  <span v-if="position.trip_seq !== dateData[1][positionIndex-1].trip_seq"-->
-<!--                        class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>-->
-<!--                  </template>-->
-<!--                  <template v-else>-->
-<!--                    <span class="absolute left-2.5 top-4 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true"/>-->
-<!--                  </template>-->
-
-
-
                   <div class="relative flex space-x-3 clickable" @click="setCenter(position)">
                     <template v-if="position.is_start && position.is_end">
                       <div>

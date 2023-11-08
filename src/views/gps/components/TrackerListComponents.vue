@@ -85,38 +85,15 @@ export default {
     async search() {
       await this.setTrackerListData(1)
     },
-    async addTrackers(trackerList) {
-      const data = trackerList.map(tracker => {
-        return {
-          id: tracker.id,
-          action: 'add'
-        }
-      })
-      const response = await setTrackerAPI(this.gpsSession.id, data)
-      this.$emit('setTrackers', response.map(response => {
-        response['action'] = 'add'
-        return response
-      }))
-      return response
-    },
-    async removeTrackers(trackerList) {
-      const data = trackerList.map(tracker => {
-        return {
-          id: tracker.id,
-          action: 'remove'
-        }
-      })
-      const response = await setTrackerAPI(this.gpsSession.id, data)
-      this.$emit('setTrackers', data)
-      return response
-    },
     async addTracker(tracker) {
-      const response = await this.addTrackers([tracker])
-      return response
+      let data = {...tracker, action: 'add'}
+      this.$emit('setTrackers', data)
+      return data
     },
     async removeTracker(tracker) {
-      const response = await this.removeTrackers([tracker])
-      return response
+      let data = {...tracker, action: 'remove'}
+      this.$emit('setTrackers', data)
+      return data
     },
     async toggleTracker(tracker) {
       let selected = tracker.selected
@@ -139,7 +116,7 @@ export default {
 
 <template>
 
-  <div v-if="show">
+  <div v-if="show" style="z-index: 999999999">
 
     <TransitionRoot as="template" :show="show">
       <Dialog as="div" class="relative z-50" @close="$emit('update:show', false)">
