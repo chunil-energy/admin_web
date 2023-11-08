@@ -13,9 +13,10 @@ import {
   TransitionRoot,
   Switch
 } from '@headlessui/vue'
-import {XMarkIcon, ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/24/outline'
+import {XMarkIcon, ChevronLeftIcon, ChevronRightIcon, StarIcon} from '@heroicons/vue/24/outline'
+import {StarIcon as StarSolidIcon} from '@heroicons/vue/24/solid'
 import {EllipsisVerticalIcon} from '@heroicons/vue/20/solid'
-import {getTrackerList, setTrackerAPI} from "@/apis/gps";
+import {getTrackerList, setTrackerFavorite} from "@/apis/gps";
 import {defaultTextInput} from "@/styles";
 import {useLayoutStore} from "@/stores/layout";
 
@@ -57,7 +58,7 @@ export default {
       required: true
     }
   },
-  emits: ['setTrackers', 'update:show'],
+  emits: ['addTracker', 'removeTracker', 'update:show'],
   components: {
     Dialog, DialogPanel, DialogTitle,
     Menu,
@@ -68,7 +69,10 @@ export default {
     TransitionRoot,
     XMarkIcon, EllipsisVerticalIcon,
     ChevronLeftIcon, ChevronRightIcon,
+    StarIcon, StarSolidIcon,
     Switch
+  },
+  mounted() {
   },
   computed: {},
   methods: {
@@ -76,7 +80,6 @@ export default {
       return defaultTextInput
     },
     async setTrackerListData(page) {
-      // let trackerListData = await getTrackerList(page, this.query === '' ? null : this.query)
       this.trackerListData = await getTrackerList(page, this.query === '' ? null : this.query)
     },
     async navigatePage(page) {
@@ -87,21 +90,29 @@ export default {
     },
     async addTracker(tracker) {
       let data = {...tracker, action: 'add'}
-      this.$emit('setTrackers', data)
+      this.$emit('addTracker', data)
       return data
     },
     async removeTracker(tracker) {
       let data = {...tracker, action: 'remove'}
-      this.$emit('setTrackers', data)
+      this.$emit('removeTracker', data)
       return data
     },
+    async toggleFavorite(tracker) {
+      try {
+        const response = await setTrackerFavorite(tracker.id, tracker.favorite ? 'remove' : 'add')
+        console.log(response.status)
+        tracker.favorite = !tracker.favorite
+      } catch (e) {
+        alert(e)
+      }
+    },
     async toggleTracker(tracker) {
-      let selected = tracker.selected
       try {
         let response
-        if (tracker.selected) {
+        if (tracker.selected === true) {
           response = await this.removeTracker(tracker)
-        } else {
+        } else if (tracker.selected === false) {
           response = await this.addTracker(tracker)
         }
         return response
@@ -168,6 +179,9 @@ export default {
                           <thead>
                           <tr>
                             <th scope="col" class="py-3.5 pl-5 pr-3 text-left text-sm font-semibold text-gray-900">
+                              즐겨찾기
+                            </th>
+                            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
                               장비
                             </th>
                             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
@@ -176,9 +190,12 @@ export default {
                             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
                               설치
                             </th>
-<!--                            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">-->
-<!--                              현재위치-->
-<!--                            </th>-->
+                            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
+                              대상
+                            </th>
+                            <!--                            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">-->
+                            <!--                              현재위치-->
+                            <!--                            </th>-->
                             <th scope="col" class="py-3.5 pl-3 pr-5 text-left text-sm font-semibold text-gray-900">
                               선택
                             </th>
@@ -188,14 +205,27 @@ export default {
                           <template v-for="(tracker, trackerIndex) in trackerListData?.results || []">
                             <tr>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden pl-5 pr-3 py-3.5 text-sm text-gray-500 lg:table-cell']">
+                                <!--                                {{ tracker.favorite }}-->
+                                <div class="clickable" @click="toggleFavorite(tracker)">
+                                  <template v-if="tracker.favorite">
+                                    <StarSolidIcon class="w-5 h-5 text-yellow-400"/>
+                                  </template>
+                                  <template v-else>
+                                    <StarIcon class="w-5 h-5"/>
+                                  </template>
+                                </div>
+                              </td>
+                              <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden px-3.5 py-3.5 text-sm text-gray-500 lg:table-cell']">
                                 {{ tracker.device_type_display }}
                               </td>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden px-3.5 py-3.5 text-sm text-gray-500 lg:table-cell']">
                                 {{ tracker.identifier }}
                               </td>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden px-3.5 py-3.5 text-sm text-gray-500 lg:table-cell']">
-                                <span class="font-bold">{{tracker.target.type_display + ' '}} </span>
-                                <span>{{tracker.target.name}}</span>
+                                {{ tracker.target.type_display }}
+                              </td>
+                              <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden px-3.5 py-3.5 text-sm text-gray-500 lg:table-cell']">
+                                {{ tracker.target.name }}
                               </td>
                               <td :class="[trackerIndex === 0 ? '' : 'border-t border-gray-200', 'hidden pl-3 pr-5 py-3.5 text-sm text-gray-500 lg:table-cell']">
                                 <!--                                {{ tracker.selected }}-->

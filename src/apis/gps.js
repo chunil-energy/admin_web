@@ -67,6 +67,30 @@ const getTrackerList = async (page, query) => {
         layoutStore.overlayOff()
     }
 }
+const setTrackerFavorite = async (trackerId, action) => {
+    const errorStore = useErrorStore()
+    const layoutStore = useLayoutStore()
+    layoutStore.overlayOn()
+    try {
+        const authStore = useAuthStore()
+        await authStore.tokenRefresh()
+        const url = `${import.meta.env.VITE_API_URL}/api/admin/v1/gps/tracker/favorite/`;
+        const data = {tracker: trackerId, action}
+        const option = {
+            method: 'post', url: url, data: data, headers: {Authorization: `Bearer ${authStore.accessToken}`},
+            // validateStatus: (status) => {
+            //     return [200, 403].indexOf(status) > -1
+            // }
+        }
+        const response = await axios.request(option)
+        return response.data
+    } catch (e) {
+        await errorStore.set('error', '조회 실패', `단말기 즐겨찾기 수정 중 오류가 발생했습니다. ${e}`)
+        throw e
+    } finally {
+        layoutStore.overlayOff()
+    }
+}
 
 const setTrackerAPI = async (sessionId, trackerList) => {
     const errorStore = useErrorStore()
@@ -128,4 +152,4 @@ const getTrackerTripAPI = async (trackerId, startDateString, endDateString) => {
     }
 }
 
-export {getGPSSession, getTrackerList, setTrackerAPI, getTrackerTripAPI}
+export {getGPSSession, getTrackerList, setTrackerAPI, getTrackerTripAPI, setTrackerFavorite}

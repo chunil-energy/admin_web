@@ -55,7 +55,11 @@ export default {
     }
   },
   mounted() {
-    this.loadMap()
+    this.loadMap(() => {
+
+      this.trackerList = this.gpsSession.favorite_trackers
+      this.trackerList.forEach(tracker => this.drawTracker(tracker))
+    })
     // 최초 로딩시에는 설정된 트래커가 없으므로 redundant 하다
     // this.trackerList = this.gpsSession.tracker_set
   },
@@ -72,7 +76,7 @@ export default {
     }
   },
   methods: {
-    loadMap() {
+    loadMap(callback) {
       const script = document.createElement('script')
       script.setAttribute('src', `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${this.ncpApiKeyId}`)
       script.setAttribute('type', 'text/javascript')
@@ -109,6 +113,7 @@ export default {
           _this.mapBoundary = _this.map.getBounds()
           _this.closeContextMenu()
         });
+        callback()
         // _this.map.addListener('click', (event) => {
         //   this.sample.push({latitude: event.coord.y, longitude: event.coord.x})
         //   console.log(`{"name": "장소명", "latitude": ${event.coord.y}, "longitude": ${event.coord.x}},`)
@@ -241,6 +246,17 @@ export default {
       }
       this.tripMarkers.forEach(marker => marker.setMap(null))
     },
+    drawTracker(tracker) {
+      let trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === tracker.id)
+      // last_position이 있는 경우 마커와 폴리라인 생성
+      if (tracker.last_position) {
+        let marker = this.createMarker(tracker)
+        let listener = naver.maps.Event.addListener(marker, 'click', (event) => {
+          this.showContextMenu(event, tracker)
+        })
+        this.trackerList[trackerIndex]['marker'] = marker
+      }
+    },
     async addTracker(tracker) {
       let trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === tracker.id)
       if (trackerIndex > -1) {
@@ -250,17 +266,9 @@ export default {
       tracker['action'] = 'add'
       const response = await setTrackerAPI(this.gpsSession.id, [tracker])
       let responseTracker = response[0]
-      responseTracker['action'] = 'add'
+      tracker = {...tracker, action: 'add'}
       this.trackerList.push(responseTracker)
-      trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === responseTracker.id)
-      // last_position이 있는 경우 마커와 폴리라인 생성
-      if (responseTracker.last_position) {
-        let marker = this.createMarker(responseTracker)
-        let listener = naver.maps.Event.addListener(marker, 'click', (event) => {
-          this.showContextMenu(event, responseTracker)
-        })
-        this.trackerList[trackerIndex]['marker'] = marker
-      }
+      this.drawTracker(responseTracker)
     },
     async removeTracker(tracker) {
       this.closeContextMenu()
@@ -270,7 +278,7 @@ export default {
       if (trackerIndex <= -1) {
         return null
       }
-      tracker['action'] = 'remove'
+      tracker = {...tracker, action: 'remove'}
       const response = await setTrackerAPI(this.gpsSession.id, [tracker])
       // let polyline = this.trackerList[trackerIndex]['polyline']
       let marker = this.trackerList[trackerIndex]['marker']
@@ -282,28 +290,6 @@ export default {
         marker.setMap(null)
       }
       this.trackerList.splice(trackerIndex, 1)
-    },
-    async setTracker(trackerdata) {
-      console.log('trackerdata ', trackerdata)
-        if (trackerdata.action === 'add') {
-          await this.addTracker(trackerdata)
-        } else if (trackerdata.action === 'remove') {
-          await this.removeTracker(trackerdata)
-        }
-      // const promises = trackerList.map(async (trackerData) => {
-      //   if (trackerData.action === 'add') {
-      //     await this.addTracker(trackerData)
-      //   } else if (trackerData.action === 'remove') {
-      //     await this.removeTracker(trackerData)
-      //   }
-      // });
-      // trackerList.forEach(trackerData => {
-      //   if (trackerData.action === 'add') {
-      //     await this.addTracker(trackerData)
-      //   } else if (trackerData.action === 'remove') {
-      //     await this.removeTracker(trackerData)
-      //   }
-      // })
     },
     updateTracker(tracker, last_position) {
       let trackerIndex = this.trackerList.findIndex(existingTracker => existingTracker.id === tracker.id)
@@ -404,7 +390,9 @@ export default {
       </div>
     </div>
     <TrackerListComponents :show="showTrackerList"
-                           :gps-session="gpsSession" @setTrackers="(value) => setTracker(value)"
+                           :gps-session="gpsSession"
+                           @addTracker="(value) => addTracker(value)"
+                           @removeTracker="(value) => removeTracker(value)"
                            @update:show="value => showTrackerList = value"/>
     <ContextMenu :show="contextMenuShow" :position="contextMenuPosition" :tracker-data="contextMenuTracker"
                  @closeMenu="closeContextMenu"
