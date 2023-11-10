@@ -307,17 +307,17 @@ export default {
     },
     updatePooledData(trackers) {
       this.trackerList.forEach(oldTracker => {
-        let newTrackerIndex = trackers.findIndex(newTracker => newTracker.id === oldTracker.id)
-        if (newTrackerIndex < 0) {
+        let trackerIndex = trackers.findIndex(newTracker => newTracker.id === oldTracker.id)
+        if (trackerIndex < 0) {
           return null
         }
-        if (trackers[newTrackerIndex].last_position?.id === oldTracker.last_position?.id) {
+        if (trackers[trackerIndex].last_position?.id === oldTracker.last_position?.id) {
           return null
         }
         if (oldTracker.marker) {
           oldTracker.marker.setMap(null)
         }
-        trackers[newTrackerIndex].marker = this.createMarker(trackers[newTrackerIndex])
+        this.trackerList[trackerIndex].marker = this.createMarker(trackers[trackerIndex])
       })
     },
     setCenter(tracker) {

@@ -8,7 +8,7 @@ import {getSessionDetailAPI} from "@/apis/gps";
 export default {
   name: "RealtimeSwitch",
   setup() {
-    const interval = 1000
+    const interval = 30000
     return {defaultTextInput, interval}
   },
   components: {
@@ -71,7 +71,9 @@ export default {
       }
     }
   },
-  computed: {}
+  beforeUnmount() {
+    clearInterval(this.poolTimerId)
+  }
 }
 </script>
 
