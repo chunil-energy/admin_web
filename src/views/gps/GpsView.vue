@@ -309,7 +309,9 @@ export default {
       this.trackerList.forEach(oldTracker => {
         let trackerIndex = trackers.findIndex(newTracker => newTracker.id === oldTracker.id)
         if (trackerIndex < 0) {
-          return null
+          this.trackerList.push(newTracker)
+          this.drawTracker(newTracker)
+          trackerIndex = trackers.findIndex(newTracker => newTracker.id === oldTracker.id)
         }
         if (trackers[trackerIndex].last_position?.id === oldTracker.last_position?.id) {
           return null
@@ -318,6 +320,7 @@ export default {
           oldTracker.marker.setMap(null)
         }
         this.trackerList[trackerIndex].marker = this.createMarker(trackers[trackerIndex])
+        this.trackerList[trackerIndex].last_position = trackers[trackerIndex].last_position
       })
     },
     setCenter(tracker) {
