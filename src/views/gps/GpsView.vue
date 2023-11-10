@@ -311,15 +311,13 @@ export default {
         if (newTrackerIndex < 0) {
           return null
         }
-        let newTracker = trackers[newTrackerIndex]
-        if (newTracker.last_position?.id === oldTracker.last_position?.id) {
+        if (trackers[newTrackerIndex].last_position?.id === oldTracker.last_position?.id) {
           return null
         }
-        let oldMarker = oldTracker.marker
-        if (oldTracker) {
-          oldMarker.setMap(null)
+        if (oldTracker.marker) {
+          oldTracker.marker.setMap(null)
         }
-        trackers[newTrackerIndex].marker = this.createMarker(newTracker)
+        trackers[newTrackerIndex].marker = this.createMarker(trackers[newTrackerIndex])
       })
     },
     setCenter(tracker) {
