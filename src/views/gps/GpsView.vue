@@ -119,7 +119,7 @@ export default {
             interval: 300000 // 5분마다 새로고침 (최소값 5분)
         });
         naver.maps.Event.once(this.map, 'init', function(trafficLayer) {
-          trafficLayer.setMap(this.map)
+          trafficLayer.setMap(_this.map)
         });
         trafficLayer.startAutoRefresh();
         callback()
