@@ -8,8 +8,9 @@ import {getSessionDetailAPI} from "@/apis/gps";
 export default {
   name: "RealtimeSwitch",
   setup() {
-    const interval = 30000
-    return {defaultTextInput, interval}
+    const interval = 1000
+    const duration = 30000
+    return {defaultTextInput, interval, duration}
   },
   components: {
     TransitionChild, TransitionRoot, Switch
@@ -42,8 +43,11 @@ export default {
       this.pooling = true
       this.poolTimerId = setInterval(async () => {
         this.elapsed += this.interval
-        let response = await getSessionDetailAPI(this.sessionId)
-        this.$emit('pooledData', response)
+        if (this.elapsed === this.duration) {
+          let response = await getSessionDetailAPI(this.sessionId)
+          this.$emit('pooledData', response)
+          this.elapsed = 0
+        }
       }, this.interval)
 
     },
@@ -71,6 +75,11 @@ export default {
       }
     }
   },
+  computed: {
+    remainTime() {
+      return parseInt((this.duration - this.elapsed)/1000)
+    }
+  },
   beforeUnmount() {
     clearInterval(this.poolTimerId)
   }
@@ -78,7 +87,6 @@ export default {
 </script>
 
 <template>
-
   <Switch @click="togglePooling" v-model="pooling"
           :class="[pooling ? 'bg-indigo-600' : '' +
            'bg-gray-200', 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
@@ -103,6 +111,7 @@ export default {
                                     </span>
                                   </span>
   </Switch>
+  <div class="text-sm" v-if="pooling">{{remainTime}}초 후 갱신</div>
 </template>
 
 <style scoped>
