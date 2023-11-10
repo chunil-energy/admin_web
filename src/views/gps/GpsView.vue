@@ -10,6 +10,7 @@ import {defaultTextInput} from "@/styles";
 import {XMarkIcon} from "@heroicons/vue/24/outline";
 import {Switch} from "@headlessui/vue"
 import RealtimeSwitch from "@/views/gps/components/RealtimeSwitch.vue";
+import TrafficSwitch from "@/views/gps/components/TrafficSwitch.vue";
 
 export default {
   name: 'GpsView',
@@ -54,6 +55,8 @@ export default {
       tripTotalPolyline: null,
       tripPartialPolyline: null,
       tripMarkers: [],
+      // 실시간 교통정보
+      trafficLayer: null
     }
   },
   mounted() {
@@ -64,7 +67,7 @@ export default {
     // 최초 로딩시에는 설정된 트래커가 없으므로 redundant 하다
     // this.trackerList = this.gpsSession.tracker_set
   },
-  components: {RealtimeSwitch, XMarkIcon, TripDialog, ContextMenu, TrackerListComponents, Switch},
+  components: {TrafficSwitch, RealtimeSwitch, XMarkIcon, TripDialog, ContextMenu, TrackerListComponents, Switch},
   computed: {
     filteredTrackerList() {
       if (this.trackerSearchQuery) {
@@ -115,13 +118,13 @@ export default {
           _this.closeContextMenu()
         });
         // 실시간 교통정보
-        var trafficLayer = new naver.maps.TrafficLayer({
-            interval: 300000 // 5분마다 새로고침 (최소값 5분)
+        this.trafficLayer = new naver.maps.TrafficLayer({
+          interval: 300000 // 5분마다 새로고침 (최소값 5분)
         });
-        naver.maps.Event.once(this.map, 'init', function(trafficLayer) {
-          trafficLayer.setMap(_this.map)
+        naver.maps.Event.once(this.map, 'init', function () {
+          // _this.trafficLayer.setMap(_this.map)
         });
-        trafficLayer.startAutoRefresh();
+        // this.trafficLayer.startAutoRefresh();
         callback()
         // _this.map.addListener('click', (event) => {
         //   this.sample.push({latitude: event.coord.y, longitude: event.coord.x})
@@ -129,6 +132,15 @@ export default {
         // })
       }
       document.body.append(script)
+    },
+    setTraffic(value) {
+      if (value === true) {
+        this.trafficLayer.setMap(this.map)
+        this.trafficLayer.startAutoRefresh();
+      } else if (value === false) {
+        this.trafficLayer.setMap(null)
+        this.trafficLayer.endAutoRefresh();
+      }
     },
     generateMarkerIconHtml(tracker) {
       let htmlArray
@@ -431,12 +443,14 @@ export default {
                  @removeTracker="tracker => removeTracker(tracker)"
                  @setCenter="tracker => {setCenter(tracker); tripTracker = null; tripDialogShow = false}"/>
     <div class="absolute right-3 top-3 bg-white border border-blue-600 p-2 rounded-3xl">
-      <div class="flex justify-between items-center gap-2">
-      <div class="text-sm font-bold">실시간</div>
-      <RealtimeSwitch :trip-dialog-show="tripDialogShow" :session-id="gpsSession.id"
-                      @pooledData="data => updatePooledData(data.trackers)"
-                      @closeTripDialog="closeTripDialog"/>
-        </div>
+      <div class="flex justify-between items-center gap-2 px-2">
+        <div class="text-sm font-bold">실시간</div>
+        <RealtimeSwitch :trip-dialog-show="tripDialogShow" :session-id="gpsSession.id"
+                    @pooledData="data => updatePooledData(data.trackers)"
+                    @closeTripDialog="closeTripDialog"/>
+        <div class="text-sm font-bold">교통정보</div>
+        <TrafficSwitch @trafficShowValueChange="value => setTraffic(value)"/>
+      </div>
     </div>
   </div>
   <!--  <div>-->
