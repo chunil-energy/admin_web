@@ -97,7 +97,7 @@ export default {
           mapTypeId: naver.maps.MapTypeId.NORMAL,
           mapTypeControl: true,
           mapTypeControlOptions: {
-            style: naver.maps.MapTypeControlStyle.BUTTON,
+            style: naver.maps.MapTypeControlStyle.DROPDOWN,
             position: naver.maps.Position.LEFT_TOP
           }
         }
@@ -114,6 +114,14 @@ export default {
           _this.mapBoundary = _this.map.getBounds()
           _this.closeContextMenu()
         });
+        // 실시간 교통정보
+        var trafficLayer = new naver.maps.TrafficLayer({
+            interval: 300000 // 5분마다 새로고침 (최소값 5분)
+        });
+        naver.maps.Event.once(this.map, 'init', function(trafficLayer) {
+          trafficLayer.setMap(this.map)
+        });
+        trafficLayer.startAutoRefresh();
         callback()
         // _this.map.addListener('click', (event) => {
         //   this.sample.push({latitude: event.coord.y, longitude: event.coord.x})
