@@ -87,6 +87,12 @@ export default {
 </script>
 
 <template>
+  <template v-if="pooling">
+    <div class="text-sm">{{remainTime}}초 후 갱신</div>
+  </template>
+  <template v-else>
+    <div class="text-sm font-bold">실시간</div>
+  </template>
   <Switch @click="togglePooling" v-model="pooling"
           :class="[pooling ? 'bg-indigo-600' : '' +
            'bg-gray-200', 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
@@ -111,7 +117,6 @@ export default {
                                     </span>
                                   </span>
   </Switch>
-  <div class="text-sm" v-if="pooling">{{remainTime}}초 후 갱신</div>
 </template>
 
 <style scoped>

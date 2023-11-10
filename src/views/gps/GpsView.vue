@@ -444,7 +444,6 @@ export default {
                  @setCenter="tracker => {setCenter(tracker); tripTracker = null; tripDialogShow = false}"/>
     <div class="absolute right-3 top-3 bg-white border border-blue-600 p-2 rounded-3xl">
       <div class="flex justify-between items-center gap-2 px-2">
-        <div class="text-sm font-bold">실시간</div>
         <RealtimeSwitch :trip-dialog-show="tripDialogShow" :session-id="gpsSession.id"
                     @pooledData="data => updatePooledData(data.trackers)"
                     @closeTripDialog="closeTripDialog"/>
