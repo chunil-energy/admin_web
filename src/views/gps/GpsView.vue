@@ -2,12 +2,14 @@
 import {useRoute} from "vue-router";
 import {useErrorStore} from "@/stores/error";
 import TrackerListComponents from "@/views/gps/components/TrackerListComponents.vue";
-import {getGPSSession, setTrackerAPI} from "@/apis/gps";
+import {getGPSSession, getSessionDetailAPI, setTrackerAPI} from "@/apis/gps";
 import {useLayoutStore} from "@/stores/layout";
 import ContextMenu from "@/views/gps/components/ContextMenu.vue";
 import TripDialog from "@/views/gps/components/TripDialog.vue";
 import {defaultTextInput} from "@/styles";
 import {XMarkIcon} from "@heroicons/vue/24/outline";
+import {Switch} from "@headlessui/vue"
+import RealtimeSwitch from "@/views/gps/components/RealtimeSwitch.vue";
 
 export default {
   name: 'GpsView',
@@ -51,19 +53,18 @@ export default {
       tripTracker: null,
       tripTotalPolyline: null,
       tripPartialPolyline: null,
-      tripMarkers: []
+      tripMarkers: [],
     }
   },
   mounted() {
     this.loadMap(() => {
-
       this.trackerList = this.gpsSession.favorite_trackers
       this.trackerList.forEach(tracker => this.drawTracker(tracker))
     })
     // 최초 로딩시에는 설정된 트래커가 없으므로 redundant 하다
     // this.trackerList = this.gpsSession.tracker_set
   },
-  components: {XMarkIcon, TripDialog, ContextMenu, TrackerListComponents},
+  components: {RealtimeSwitch, XMarkIcon, TripDialog, ContextMenu, TrackerListComponents, Switch},
   computed: {
     filteredTrackerList() {
       if (this.trackerSearchQuery) {
@@ -304,6 +305,23 @@ export default {
       }
       this.trackerList[trackerIndex].marker = newMarker
     },
+    updatePooledData(trackers) {
+      this.trackerList.forEach(oldTracker => {
+        let newTrackerIndex = trackers.findIndex(newTracker => newTracker.id === oldTracker.id)
+        if (newTrackerIndex < 0) {
+          return null
+        }
+        let newTracker = trackers[newTrackerIndex]
+        if (newTracker.last_position?.id === oldTracker.last_position?.id) {
+          return null
+        }
+        let oldMarker = oldTracker.marker
+        if (oldTracker) {
+          oldMarker.setMap(null)
+        }
+        trackers[newTrackerIndex].marker = this.createMarker(newTracker)
+      })
+    },
     setCenter(tracker) {
       if (!tracker.last_position) {
         alert('위치정보가 없습니다.')
@@ -329,6 +347,10 @@ export default {
       this.contextMenuShow = false
       this.contextMenuTracker = null
       this.contextMenuPosition = [0, 0]
+    },
+    closeTripDialog() {
+      this.tripDialogShow = false
+      this.tripTracker = null
     }
   }
 }
@@ -384,7 +406,7 @@ export default {
                   @removePartialPolyline="removePartialPolyline"
                   @setCenter="setPositionCenter"
                   @removeTotalPolyline="removeTotalPolyline"
-                  :tracker-data="tripTracker" @closeDialog="() => {tripDialogShow = false; tripTracker=null}"/>
+                  :tracker-data="tripTracker" @closeDialog="closeTripDialog"/>
       <div :class="[tripDialogShow ? 'col-span-9' : 'col-span-11']">
         <div id="mapDiv" class="w-full h-screen"></div>
       </div>
@@ -399,6 +421,14 @@ export default {
                  @showTripDialog="(tracker) => {tripTracker = tracker; tripDialogShow = true; setCenter(tracker)}"
                  @removeTracker="tracker => removeTracker(tracker)"
                  @setCenter="tracker => {setCenter(tracker); tripTracker = null; tripDialogShow = false}"/>
+    <div class="absolute right-3 top-3 bg-white border border-blue-600 p-2 rounded-3xl">
+      <div class="flex justify-between items-center gap-2">
+      <div class="text-sm font-bold">실시간</div>
+      <RealtimeSwitch :trip-dialog-show="tripDialogShow" :session-id="gpsSession.id"
+                      @pooledData="data => updatePooledData(data.trackers)"
+                      @closeTripDialog="closeTripDialog"/>
+        </div>
+    </div>
   </div>
   <!--  <div>-->
   <!--    -->

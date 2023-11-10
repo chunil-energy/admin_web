@@ -123,6 +123,34 @@ const setTrackerAPI = async (sessionId, trackerList) => {
     }
 }
 
+const getSessionDetailAPI = async (sessionId) => {
+    const errorStore = useErrorStore()
+    const layoutStore = useLayoutStore()
+    // layoutStore.overlayOn()
+    try {
+        const authStore = useAuthStore()
+        await authStore.tokenRefresh()
+        const url = `${import.meta.env.VITE_API_URL}/api/admin/v1/gps/session/${sessionId}/`;
+        const option = {
+            method: 'get', url: url, headers: {Authorization: `Bearer ${authStore.accessToken}`},
+            validateStatus: (status) => {
+                return [200, 403].indexOf(status) > -1
+            }
+        }
+        const response = await axios.request(option)
+        if (response.status === 403) {
+            await errorStore.set('error', '권한 오류', '세션 조회 권한이 없습니다.')
+            return []
+        }
+        return response.data
+    } catch (e) {
+        await errorStore.set('error', '조회 실패', `세션 조회중 오류가 발생했습니다. ${e}`)
+        return []
+    } finally {
+        // layoutStore.overlayOff()
+    }
+}
+
 const getTrackerTripAPI = async (trackerId, startDateString, endDateString) => {
     const errorStore = useErrorStore()
     const layoutStore = useLayoutStore()
@@ -152,4 +180,4 @@ const getTrackerTripAPI = async (trackerId, startDateString, endDateString) => {
     }
 }
 
-export {getGPSSession, getTrackerList, setTrackerAPI, getTrackerTripAPI, setTrackerFavorite}
+export {getGPSSession, getTrackerList, setTrackerAPI, getTrackerTripAPI, setTrackerFavorite, getSessionDetailAPI}
